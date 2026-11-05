@@ -61,7 +61,15 @@ h1 img{width:34px;height:34px;border-radius:9px}
 /* 홈 */
 #vHome{display:flex;flex-direction:column;gap:16px}
 #vHome[hidden]{display:none!important}
-.homegrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.homegrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.homecard.td .ic{background:var(--care-soft);color:var(--care)}
+.homecard.pl{cursor:default;opacity:.6}
+.homecard.pl .ic{background:var(--chip);color:var(--muted)}
+.todotabs{display:flex;background:var(--chip);border-radius:12px;padding:4px;gap:4px;max-width:420px}
+.todotabs button{flex:1;border:0;background:transparent;border-radius:9px;padding:10px;min-height:44px;font-weight:500;color:var(--muted)}
+.todotabs button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.todotabs .n{font-variant-numeric:tabular-nums;margin-left:4px;opacity:.75}
+.shop-panel{max-width:640px;margin:0 auto;width:100%}
 .homecard{all:unset;cursor:pointer;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:22px;display:flex;flex-direction:column;gap:14px;min-height:190px}
 .homecard:focus-visible{outline:2px solid var(--accent)}
 .homecard .ic{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center}
@@ -102,7 +110,9 @@ h2{font-family:var(--display);font-weight:400;font-size:1.45rem;margin:0}
 .or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
 
 form.add{display:grid;gap:8px}
-#fAdd{grid-template-columns:2fr 1fr 1fr 1.3fr auto}
+#fAdd{grid-template-columns:repeat(6,minmax(0,1fr))}
+#fName{grid-column:span 3} #fSize{grid-column:span 2} #fCount{grid-column:span 1}
+#fCat{grid-column:span 2} #fZone{grid-column:span 1} #fExp{grid-column:span 2} #fAdd .primary{grid-column:span 1}
 #sAdd{grid-template-columns:2fr 1fr auto}
 input,select,textarea{width:100%;min-width:0;min-height:44px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
 textarea{min-height:96px;resize:vertical;line-height:1.5}
@@ -141,6 +151,24 @@ ul.list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
 .shop-actions{display:flex;flex-wrap:wrap;gap:8px}
 .shop-actions .primary{flex:1}
 .legend{font-size:.8rem;color:var(--muted)}
+.zchips{display:flex;gap:6px;flex-wrap:wrap}
+.zchips .spacer{flex:1}
+.zchips button{border:1px solid var(--line);background:transparent;border-radius:999px;padding:4px 12px;min-height:34px;font-size:.85rem;color:var(--muted)}
+.zchips button[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:600}
+.item .name .size{font-weight:400;color:var(--muted);margin-left:6px}
+.item .spare{white-space:nowrap;display:inline-block;font-size:.74rem;font-weight:600;color:var(--accent);background:var(--accent-soft);border-radius:6px;padding:1px 7px;margin-left:6px;vertical-align:1px}
+.item .ztag{white-space:nowrap;display:inline-block;font-size:.72rem;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:0 5px;margin-left:6px}
+ul.lots{list-style:none;margin:0 0 4px;padding:0 0 0 14px;border-left:2px solid var(--line);display:flex;flex-direction:column}
+ul.lots li button{all:unset;cursor:pointer;display:flex;flex-wrap:wrap;column-gap:8px;font-size:.8rem;color:var(--muted);padding:3px 0;font-variant-numeric:tabular-nums}
+ul.lots li button span{white-space:nowrap}
+ul.lots li button .bad{color:var(--bad);font-weight:600} ul.lots li button .warn{color:var(--warn);font-weight:600}
+.draft{display:flex;gap:14px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:12px}
+.draft img{width:84px;height:84px;object-fit:cover;border-radius:10px;flex:none}
+.draft p{margin:2px 0 10px;color:var(--muted);font-size:.88rem}
+.draft .row{display:flex;gap:8px;flex-wrap:wrap}
+.shoot{display:flex;gap:8px;flex-wrap:wrap}
+.shoot .camera{flex:2;min-width:180px}
+.shoot .ghost{flex:1;min-width:150px}
 
 /* 집관리 */
 .carebar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
@@ -199,7 +227,7 @@ li.bad .tt{color:var(--bad)}
 .found{display:flex;flex-direction:column;gap:10px}
 .fcard{border:1px solid var(--line);border-radius:12px;padding:12px;display:grid;grid-template-columns:auto 1fr;gap:8px 10px;align-items:start}
 .fcard.off{opacity:.5}
-.fcard .fields{display:grid;grid-template-columns:2fr 1fr;gap:8px;min-width:0}
+.fcard .fields{display:grid;grid-template-columns:1fr 1fr;gap:8px;min-width:0}
 .fcard .fields .full{grid-column:1/-1}
 .fcard .note{grid-column:1/-1;font-size:.8rem;color:var(--warn)}
 .fcard input[type=checkbox]{margin-top:11px}
@@ -217,10 +245,10 @@ li.bad .tt{color:var(--bad)}
 .err{color:var(--bad);font-size:.9rem}
 
 @media (max-width:899px){
+  .homegrid{grid-template-columns:1fr 1fr}
+  .homecard.pl{grid-column:1/-1}
   .tabs{display:flex}
   .grid{grid-template-columns:1fr}
-  .grid .panel{display:none}
-  body[data-ftab="fridge"] #fridge, body[data-ftab="shop"] #shop{display:flex}
   .assets{grid-template-columns:1fr}
 }
 @media (max-width:600px){
@@ -228,8 +256,8 @@ li.bad .tt{color:var(--bad)}
   .homegrid{grid-template-columns:1fr}
   .homecard{min-height:0}
   #fAdd{grid-template-columns:1fr 1fr}
-  #fAdd #fName{grid-column:1/-1}
-  #fAdd .primary{grid-column:1/-1}
+  #fName,#fExp,#fAdd .primary{grid-column:1/-1}
+  #fSize,#fCount,#fCat,#fZone{grid-column:span 1}
   #sAdd{grid-template-columns:1fr 90px auto}
   .panel{padding:14px}
   .fcard .fields{grid-template-columns:1fr 1fr}
@@ -274,14 +302,19 @@ li.bad .tt{color:var(--bad)}
     <div class="homegrid">
       <button class="homecard fr" type="button" id="goFridge">
         <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="5" y="2.5" width="14" height="19" rx="2.5"/><path d="M5 9.5h14M8.5 5.5v2M8.5 12.5v3"/></svg></span>
-        <div><h2>냉장고</h2><p>재고 · 유통기한 · 장보기</p></div>
+        <div><h2>냉장고</h2><p>재고 · 유통기한</p></div>
         <div class="stats" id="hsFridge"></div>
       </button>
-      <button class="homecard ca" type="button" id="goCare">
-        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></svg></span>
-        <div><h2>집관리</h2><p>가전 · 가구 청소와 교체 일정</p></div>
-        <div class="stats" id="hsCare"></div>
+      <button class="homecard td" type="button" id="goTodo">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3.5" width="16" height="17" rx="2.5"/><path d="M8 9l1.5 1.5L12 8M8 15l1.5 1.5L12 14M14.5 9.5H17M14.5 15.5H17"/></svg></span>
+        <div><h2>할일</h2><p>장보기 · 집관리</p></div>
+        <div class="stats" id="hsTodo"></div>
       </button>
+      <div class="homecard pl" aria-disabled="true">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></span>
+        <div><h2>일정</h2><p>카카오·네이버 캘린더 연결 예정</p></div>
+        <div class="stats"><span class="pill">준비 중</span></div>
+      </div>
     </div>
     <div class="agenda" id="agenda" hidden>
       <h3>지금 챙길 것</h3>
@@ -292,11 +325,7 @@ li.bad .tt{color:var(--bad)}
   <!-- 냉장고 -->
   <section id="vFridge" hidden>
     <div class="wrap">
-      <nav class="tabs" role="tablist">
-        <button type="button" role="tab" id="tabFridge" data-ftab="fridge">냉장고<span class="n" id="nFridge"></span></button>
-        <button type="button" role="tab" id="tabShop" data-ftab="shop">장보기<span class="n" id="nShop"></span></button>
-      </nav>
-      <main class="grid">
+      <main>
         <section class="panel" id="fridge" aria-labelledby="hFridge">
           <div class="panel-head"><h2 id="hFridge">냉장고</h2><div class="stats" id="fStats"></div></div>
           <button class="camera" type="button" id="camBtn">
@@ -305,30 +334,48 @@ li.bad .tt{color:var(--bad)}
           </button>
           <div class="or">직접 입력</div>
           <form class="add" id="fAdd" autocomplete="off">
-            <input id="fName" placeholder="넣을 것 (예: 우유)" aria-label="이름" required>
-            <input id="fQty" placeholder="수량" aria-label="수량">
+            <input id="fName" placeholder="제품명 (예: 서울우유)" aria-label="제품명" required>
+            <input id="fSize" placeholder="용량 (예: 1L)" aria-label="용량">
+            <input id="fCount" type="number" min="1" value="1" inputmode="numeric" aria-label="개수">
+            <select id="fCat" aria-label="종류"></select>
             <select id="fZone" aria-label="보관 위치"><option>냉장</option><option>냉동</option><option>실온</option></select>
             <input id="fExp" type="date" aria-label="유통기한">
             <button class="primary" type="submit">넣기</button>
           </form>
+          <div class="zchips" id="zchips">
+            <button type="button" data-z="" aria-pressed="true">전체</button><button type="button" data-z="냉장" aria-pressed="false">냉장</button>
+            <button type="button" data-z="냉동" aria-pressed="false">냉동</button><button type="button" data-z="실온" aria-pressed="false">실온</button>
+            <span class="spacer"></span>
+            <button type="button" data-sort="cat" aria-pressed="true">종류별</button><button type="button" data-sort="date" aria-pressed="false">기한순</button>
+          </div>
           <div id="fridgeBody"></div>
           <div class="legend">막대는 전체 기간 중 남은 비율입니다. 50% 이하 주황, 20% 이하 빨강.</div>
         </section>
-        <section class="panel" id="shop" aria-labelledby="hShop">
-          <div class="panel-head"><h2 id="hShop">장보기</h2><span class="count" id="cShop"></span></div>
-          <form class="add" id="sAdd" autocomplete="off">
-            <input id="sName" placeholder="살 것 (예: 계란)" aria-label="이름" required>
-            <input id="sQty" placeholder="수량" aria-label="수량">
-            <button class="primary" type="submit">추가</button>
-          </form>
-          <div id="shopBody"></div>
-          <div class="shop-actions" id="shopActions" hidden>
-            <button class="primary" type="button" id="moveIn"></button>
-            <button class="ghost" type="button" id="clearDone">체크한 것 지우기</button>
-          </div>
-        </section>
       </main>
     </div>
+  </section>
+
+  <!-- 할일: 장보기 / 집관리 -->
+  <section id="vTodo" hidden>
+   <div class="wrap">
+    <nav class="todotabs" role="tablist">
+      <button type="button" role="tab" id="tabShop" data-tt="shop">장보기<span class="n" id="nShop"></span></button>
+      <button type="button" role="tab" id="tabCare" data-tt="care">집관리<span class="n" id="nCare"></span></button>
+    </nav>
+  <section id="vShop" hidden>
+        <section class="panel shop-panel" id="shop" aria-labelledby="hShop">
+        <div class="panel-head"><h2 id="hShop">장보기</h2><span class="count" id="cShop"></span></div>
+        <form class="add" id="sAdd" autocomplete="off">
+          <input id="sName" placeholder="살 것 (예: 계란)" aria-label="이름" required>
+          <input id="sSize" placeholder="용량" aria-label="용량">
+          <button class="primary" type="submit">추가</button>
+        </form>
+        <div id="shopBody"></div>
+        <div class="shop-actions" id="shopActions" hidden>
+          <button class="primary" type="button" id="moveIn"></button>
+          <button class="ghost" type="button" id="clearDone">체크한 것 지우기</button>
+        </div>
+      </section>
   </section>
 
   <!-- 집관리 -->
@@ -344,11 +391,14 @@ li.bad .tt{color:var(--bad)}
       <div class="assets" id="assets"></div>
     </div>
   </section>
+   </div>
+  </section>
 
   <div class="foot"><a id="sheetLink" href="#" target="_blank" rel="noopener" hidden>구글 시트에서 원본 보기</a></div>
 </div>
 
-<input type="file" id="photoNew" accept="image/*" multiple hidden>
+<input type="file" id="photoNew" accept="image/*" hidden>
+<input type="file" id="photoMulti" accept="image/*" multiple hidden>
 <input type="file" id="photoDate" accept="image/*" hidden>
 <input type="file" id="photoAsset" accept="image/*" multiple hidden>
 
@@ -358,9 +408,13 @@ li.bad .tt{color:var(--bad)}
 <div class="sheet" id="editSheet" hidden role="dialog" aria-modal="true" aria-labelledby="editTitle">
   <div class="sheet-card">
     <h3 id="editTitle">항목 고치기</h3>
-    <label>이름<input id="eName"></label>
+    <label>제품명<input id="eName"></label>
     <div class="two">
-      <label>수량<input id="eQty"></label>
+      <label>용량<input id="eSize" placeholder="예: 500g"></label>
+      <label>개수<input id="eCount" type="number" min="0" inputmode="numeric"></label>
+    </div>
+    <div class="two">
+      <label>종류<select id="eCat"></select></label>
       <label>보관 위치<select id="eZone"><option>냉장</option><option>냉동</option><option>실온</option></select></label>
     </div>
     <label>유통기한(소비기한)
@@ -384,13 +438,26 @@ li.bad .tt{color:var(--bad)}
 <!-- 식료품 사진 결과 -->
 <div class="sheet" id="photoSheet" hidden role="dialog" aria-modal="true" aria-labelledby="photoTitle">
   <div class="sheet-card wide">
-    <h3 id="photoTitle">사진에서 찾은 것</h3>
-    <div class="thumbs" id="thumbs"></div>
+    <h3 id="photoTitle">사진으로 넣기</h3>
+    <div class="draft" id="draft" hidden>
+      <img id="draftImg" alt="">
+      <div>
+        <b>앞면을 찍었습니다</b>
+        <p>유통기한이 다른 면에 있으면 그 면도 찍어 주세요. 두 장을 합쳐서 한 제품으로 읽습니다.</p>
+        <div class="row"><button class="primary" type="button" id="dBack">날짜 면 찍기</button><button class="ghost" type="button" id="dGo">이대로 읽기</button></div>
+      </div>
+    </div>
+    <div class="shoot" id="shoot">
+      <button class="camera" type="button" id="pNext">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+        다음 제품 찍기
+      </button>
+      <button class="ghost" type="button" id="pMulti">영수증·여러 제품 한 장</button>
+    </div>
     <div id="photoBusy" class="busy"><span class="spin"></span><span id="busyText"></span></div>
     <div id="photoMsg" class="empty" hidden></div>
     <div class="found" id="found"></div>
     <div class="sheet-actions">
-      <button class="ghost" type="button" id="pMore">다음 사진 찍기</button>
       <span class="spacer"></span>
       <button class="ghost" type="button" id="pCancel">닫기</button>
       <button class="primary" type="button" id="pSave" disabled>냉장고에 넣기</button>
@@ -479,8 +546,15 @@ li.bad .tt{color:var(--bad)}
 (function(){
   const $ = s => document.querySelector(s);
   const ZONES = ['냉장','냉동','실온'];
+  const FOOD_CATS = ['채소','과일','육류','생선·해산물','유제품·계란','소스·양념','반찬·가공식품','곡물·면·빵','음료','간식','기타'];
+  const countOf = i => (Number(i.count) > 0 ? Number(i.count) : (parseInt(i.qty, 10) || 1));
+  const sizeOf = i => i.size || (i.qty && !/^\d+\s*개?$/.test(i.qty) ? i.qty : '');
+  const catOf = i => FOOD_CATS.includes(i.foodCat) ? i.foodCat : '기타';
+  const prodKey = i => (String(i.name || '').replace(/\s+/g,'') + '|' + String(sizeOf(i)).replace(/\s+/g,'')).toLowerCase();
+  const fullName = i => i.name + (sizeOf(i) ? ' ' + sizeOf(i) : '');
+  function fillCats(sel){ sel.innerHTML = ''; FOOD_CATS.forEach(c => { const o = document.createElement('option'); o.textContent = c; sel.append(o); }); }
   const state = { items: [], assets: [], tasks: [], ready: false, view: 'home', onlyDue: false,
-    editing: null, photos: [], found: [], jobs: 0, assetEditing: null, taskEditing: null, taskDraftHist: [], doneTask: null, searching: {} };
+    editing: null, photos: [], found: [], jobs: 0, draft: null, shotStage: 'front', zoneFilter: '', fridgeSort: 'cat', assetEditing: null, taskEditing: null, taskDraftHist: [], doneTask: null, searching: {} };
   let dateTarget = null;
 
   /* ---------- 연결 정보 (이 기기에만 저장) ---------- */
@@ -581,32 +655,37 @@ li.bad .tt{color:var(--bad)}
   const tasksOf = id => state.tasks.filter(t => t.assetId === id);
 
   /* ---------- 화면 이동 ---------- */
-  let ftab = 'fridge';
-  try { ftab = localStorage.getItem('s-home-ftab') || 'fridge'; } catch(e){}
-  function setFtab(t){
-    ftab = t; document.body.dataset.ftab = t;
-    $('#tabFridge').setAttribute('aria-selected', t === 'fridge');
-    $('#tabShop').setAttribute('aria-selected', t === 'shop');
-    try { localStorage.setItem('s-home-ftab', t); } catch(e){}
+  state.todoTab = 'shop';
+  try { state.fridgeSort = localStorage.getItem('s-home-fsort') || 'cat'; state.todoTab = localStorage.getItem('s-home-todo') || 'shop'; } catch(e){}
+  function setTodoTab(t){
+    state.todoTab = t;
+    $('#vShop').hidden = t !== 'shop'; $('#vCare').hidden = t !== 'care';
+    $('#tabShop').setAttribute('aria-selected', t === 'shop'); $('#tabCare').setAttribute('aria-selected', t === 'care');
+    try { localStorage.setItem('s-home-todo', t); } catch(e){}
+    render();
   }
-  document.querySelectorAll('.tabs button').forEach(b => b.addEventListener('click', () => setFtab(b.dataset.ftab)));
-  setFtab(ftab);
+  document.querySelectorAll('.todotabs button').forEach(b => b.addEventListener('click', () => setTodoTab(b.dataset.tt)));
 
   function go(view){
     state.view = view; document.body.dataset.view = view;
-    $('#vHome').hidden = view !== 'home'; $('#vFridge').hidden = view !== 'fridge'; $('#vCare').hidden = view !== 'care';
+    // 예전 주소(#shop, #care)는 할일 화면의 해당 탭으로
+    if(view === 'shop' || view === 'care'){ state.todoTab = view; view = 'todo'; }
+    state.view = view; document.body.dataset.view = view;
+    $('#vHome').hidden = view !== 'home'; $('#vFridge').hidden = view !== 'fridge'; $('#vTodo').hidden = view !== 'todo';
+    if(view === 'todo'){ $('#vShop').hidden = state.todoTab !== 'shop'; $('#vCare').hidden = state.todoTab !== 'care';
+      $('#tabShop').setAttribute('aria-selected', state.todoTab === 'shop'); $('#tabCare').setAttribute('aria-selected', state.todoTab === 'care'); }
     $('#back').hidden = view === 'home';
     const h = $('#title');
     h.innerHTML = '';
     if(view === 'home'){ const img = document.createElement('img'); img.src = 'icon-180.png'; img.alt = ''; h.append(img, 'S-home'); }
-    else h.textContent = view === 'fridge' ? '냉장고' : '집관리';
+    else h.textContent = { fridge:'냉장고', todo:'할일' }[view];
     if(location.hash.slice(1) !== (view === 'home' ? '' : view)) history.replaceState(null, '', view === 'home' ? location.pathname : '#' + view);
     window.scrollTo(0, 0);
     render();
   }
   $('#back').addEventListener('click', () => go('home'));
   $('#goFridge').addEventListener('click', () => go('fridge'));
-  $('#goCare').addEventListener('click', () => go('care'));
+  $('#goTodo').addEventListener('click', () => go('todo'));
 
   /* ---------- 그리기 ---------- */
   function el(tag, cls, text){ const e = document.createElement(tag); if(cls) e.className = cls; if(text != null) e.textContent = text; return e; }
@@ -629,8 +708,10 @@ li.bad .tt{color:var(--bad)}
 
   function render(){
     if(state.view === 'home') renderHome();
-    if(state.view === 'fridge') renderFridge();
-    if(state.view === 'care') renderCare();
+    if(state.view === 'fridge' || (state.view === 'todo' && state.todoTab === 'shop')) renderFridge();
+    if(state.view === 'todo' && state.todoTab === 'care') renderCare();
+    if(state.view === 'todo'){ const f = fridgeCounts(), c = careCounts();
+      $('#nShop').textContent = f.shop || ''; $('#nCare').textContent = (c.late + c.none) || ''; }
   }
 
   function renderHome(){
@@ -641,16 +722,15 @@ li.bad .tt{color:var(--bad)}
       if(f.over) hf.append(pill('bad','기한 지남', f.over));
       if(f.bad) hf.append(pill('bad','20% 이하', f.bad));
       if(f.warn) hf.append(pill('warn','50% 이하', f.warn));
-      hf.append(pill('ok','살 것', f.shop));
+      hf.append(el('span','pill', '전체 ' + f.fridge.length + '개'));
     }
-    const hc = $('#hsCare'); hc.innerHTML = '';
-    if(!state.ready) hc.append(el('span','pill','불러오는 중…'));
-    else if(!state.assets.length) hc.append(el('span','pill care','물건을 추가해 주세요'));
+    const ht = $('#hsTodo'); ht.innerHTML = '';
+    if(!state.ready) ht.append(el('span','pill','불러오는 중…'));
     else {
-      if(c.late) hc.append(pill('bad','해야 할 일', c.late));
-      if(c.none) hc.append(pill('bad','기록 없음', c.none));
-      if(c.soon) hc.append(pill('warn','곧 할 일', c.soon));
-      if(!c.late && !c.none && !c.soon) hc.append(el('span','pill care','모두 챙겼어요'));
+      ht.append(f.shop ? pill('ok','살 것', f.shop) : el('span','pill','살 것 없음'));
+      if(c.late + c.none) ht.append(pill('bad','집관리', c.late + c.none));
+      else if(c.soon) ht.append(pill('warn','곧 할 집관리', c.soon));
+      else if(state.assets.length) ht.append(el('span','pill care','집관리 모두 챙김'));
     }
 
     // 지금 챙길 것: 기한 20% 이하 식품 + 주기가 지난 관리 작업
@@ -662,7 +742,7 @@ li.bad .tt{color:var(--bad)}
     rows.slice(0, 8).forEach(r => {
       const li = el('li','item');
       const main = el('div','main');
-      main.append(el('span','name', r.kind === 'f' ? r.i.name : r.name));
+      main.append(el('span','name', r.kind === 'f' ? fullName(r.i) : r.name));
       main.append(el('span','qty', r.kind === 'f' ? '냉장고 · ' + (r.i.zone || '냉장') : '집관리'));
       const chip = el('span','tstat bad', r.label);
       const btn = el('button','act', r.kind === 'f' ? '보기' : '완료');
@@ -695,8 +775,6 @@ li.bad .tt{color:var(--bad)}
     if(f.bad) fs.append(pill('bad','20% 이하', f.bad));
     if(f.warn) fs.append(pill('warn','50% 이하', f.warn));
     if(state.ready && !f.over && !f.bad && !f.warn) fs.append(el('span','count', f.fridge.length + '개'));
-    $('#nFridge').textContent = f.fridge.length || '';
-    $('#nShop').textContent = open.length || '';
     $('#cShop').textContent = state.ready ? open.length + '개 남음' : '';
 
     const fb = $('#fridgeBody'); fb.innerHTML = '';
@@ -705,35 +783,49 @@ li.bad .tt{color:var(--bad)}
         ? '냉장고가 비어 있습니다. "사진으로 넣기"로 포장이나 영수증을 찍으면 제품명과 유통기한이 채워지고, 남은 기간 비율이 낮은 것부터 보입니다.'
         : '목록을 불러오는 중입니다…'));
     }
-    ZONES.forEach(z => {
-      const items = f.fridge.filter(i => (i.zone || '냉장') === z).sort((a,b) => {
-        const la = life(a), lb = life(b);
-        if(!la && lb) return 1; if(!lb && la) return -1;
-        if(la && lb){ const ka = la.left < 0 ? -1000 + la.left : la.pct, kb = lb.left < 0 ? -1000 + lb.left : lb.pct; if(ka !== kb) return ka - kb; }
-        return String(a.name).localeCompare(String(b.name), 'ko');
-      });
-      if(!items.length) return;
-      const box = el('div','zone'); box.append(el('div','zone-label', z + ' · ' + items.length));
+    document.querySelectorAll('#zchips button[data-z]').forEach(b => b.setAttribute('aria-pressed', b.dataset.z === state.zoneFilter));
+    document.querySelectorAll('#zchips button[data-sort]').forEach(b => b.setAttribute('aria-pressed', b.dataset.sort === state.fridgeSort));
+    // 유통기한이 가까운 순 (기한 없는 것은 맨 뒤)
+    const urg = i => i.expiry ? diff(todayStr(), i.expiry) : 1e6;
+    const shown = f.fridge.filter(i => !state.zoneFilter || (i.zone || '냉장') === state.zoneFilter);
+    if(f.fridge.length && !shown.length) fb.append(el('p','empty', state.zoneFilter + '에 보관 중인 것이 없습니다.'));
+    (state.fridgeSort === 'date' ? [null] : FOOD_CATS).forEach(cat => {
+      const inCat = cat === null ? shown : shown.filter(i => catOf(i) === cat);
+      if(!inCat.length) return;
+      // 같은 제품(이름+용량)을 다른 날 산 것은 한 줄로 묶고, 구매분별 기한을 아래에 표시
+      const groups = {};
+      inCat.forEach(i => { (groups[prodKey(i)] = groups[prodKey(i)] || []).push(i); });
+      const prods = Object.values(groups).map(lots => { lots.sort((a,b) => urg(a) - urg(b)); return lots; })
+        .sort((a,b) => urg(a[0]) - urg(b[0]) || String(a[0].name).localeCompare(String(b[0].name),'ko'));
+      const box = el('div','zone'); box.append(el('div','zone-label', (cat || '유통기한 가까운 순') + ' · ' + inCat.length));
       const ul = el('ul','list');
-      items.forEach(i => {
+      // 같은 제품은 붙어서 나오고, 기한이 가까운(먼저 쓸) 것이 위에 옵니다
+      prods.forEach(lots => lots.forEach((i, k) => {
+        const others = lots.filter(x => x !== i).reduce((n, x) => n + countOf(x), 0) + countOf(i) - 1;
         const li = el('li','item'), main = el('div','main');
-        main.append(el('span','name', i.name));
-        if(i.qty) main.append(el('span','qty', i.qty));
+        const nm = el('span','name', i.name);
+        if(sizeOf(i)) nm.append(el('span','size', sizeOf(i)));
+        if(k === 0 && others > 0) nm.append(el('span','spare', '재고 있음 +' + others));
+        if(!state.zoneFilter && (i.zone || '냉장') !== '냉장') nm.append(el('span','ztag', i.zone));
+        if(state.fridgeSort === 'date') nm.append(el('span','ztag', catOf(i)));
+        main.append(nm);
+        if(countOf(i) > 1) main.append(el('span','qty', countOf(i) + '개'));
         if(i.verified === 'pending' && Date.now() - (i.createdAt || 0) < 5 * 60000) main.append(el('span','verifying','제품명 확인 중…'));
         else if(i.info) main.append(el('span','info', i.info));
         const l = life(i);
         if(l){ const bar = el('div','life ' + l.cls); const fill = el('i'); fill.style.width = (l.left < 0 ? 100 : l.pct) + '%'; bar.append(fill); main.append(bar); }
-        const used = el('button','act','다 씀'); used.type = 'button'; used.title = '장보기 목록으로 옮깁니다';
-        used.addEventListener('click', () => { const p = { list:'shop', done:false, expiry:'', startDate:'' }; mutate(() => patchLocal('items',[i.id],p), { action:'update', table:'items', ids:[i.id], patch:p }); });
+        const used = el('button','act','1개 사용'); used.type = 'button';
+        used.title = '하나 줄입니다. 마지막 하나를 쓰면 장보기로 옮겨집니다';
+        used.addEventListener('click', () => useOne(i, lots));
         li.append(main, lifeChip(i), used);
         ul.append(li);
-      });
+      }));
       box.append(ul); fb.append(box);
     });
 
     const sb = $('#shopBody'); sb.innerHTML = '';
     if(!shop.length){
-      sb.append(el('p','empty', state.ready ? '살 것이 없습니다. 위 칸에 적거나, 냉장고에서 "다 씀"을 누르면 여기로 옮겨집니다.' : '목록을 불러오는 중입니다…'));
+      sb.append(el('p','empty', state.ready ? '살 것이 없습니다. 위 칸에 적거나, 냉장고에서 마지막 하나까지 "1개 사용"을 누르면 여기로 옮겨집니다.' : '목록을 불러오는 중입니다…'));
     } else {
       const byTime = (a,b) => (a.createdAt||0) - (b.createdAt||0);
       const ul = el('ul','list');
@@ -742,8 +834,7 @@ li.bad .tt{color:var(--bad)}
         const lab = el('label','check');
         const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = !!i.done; cb.id = 'c-' + i.id;
         cb.addEventListener('change', () => { const p = { done: cb.checked }; mutate(() => patchLocal('items',[i.id],p), { action:'update', table:'items', ids:[i.id], patch:p }); });
-        const main = el('span','main'); main.append(el('span','name', i.name));
-        if(i.qty) main.append(el('span','qty', i.qty));
+        const main = el('span','main'); main.append(el('span','name', fullName(i)));
         lab.append(cb, main);
         const x = el('button','x','×'); x.type = 'button'; x.setAttribute('aria-label', i.name + ' 지우기');
         x.addEventListener('click', () => mutate(() => dropLocal('items',[i.id]), { action:'delete', table:'items', ids:[i.id] }));
@@ -754,6 +845,18 @@ li.bad .tt{color:var(--bad)}
     $('#shopActions').hidden = !done.length;
     $('#moveIn').textContent = '산 것 냉장고에 넣기 (' + done.length + ')';
   }
+
+  // 1개 사용: 기한이 가장 가까운 구매분부터 줄이고, 모두 쓰면 장보기로
+  function useOne(i, lots){
+    const n = countOf(i);
+    if(n > 1){ const p = { count: n - 1 }; return mutate(() => patchLocal('items',[i.id],p), { action:'update', table:'items', ids:[i.id], patch:p }); }
+    if(lots.length > 1) return mutate(() => dropLocal('items',[i.id]), { action:'delete', table:'items', ids:[i.id] });
+    const p = { list:'shop', done:false, expiry:'', startDate:'', count:1 };
+    mutate(() => patchLocal('items',[i.id],p), { action:'update', table:'items', ids:[i.id], patch:p });
+  }
+  document.querySelectorAll('#zchips button[data-z]').forEach(b => b.addEventListener('click', () => { state.zoneFilter = b.dataset.z; renderFridge(); }));
+  document.querySelectorAll('#zchips button[data-sort]').forEach(b => b.addEventListener('click', () => {
+    state.fridgeSort = b.dataset.sort; try { localStorage.setItem('s-home-fsort', state.fridgeSort); } catch(e){} renderFridge(); }));
 
   function renderCare(){
     const c = careCounts();
@@ -839,22 +942,22 @@ li.bad .tt{color:var(--bad)}
   $('#fAdd').addEventListener('submit', e => {
     e.preventDefault();
     const name = $('#fName').value.trim(); if(!name) return;
-    const row = { id: uid(), name, qty: $('#fQty').value.trim(), zone: $('#fZone').value, expiry: $('#fExp').value || '', list:'fridge', startDate: todayStr() };
-    $('#fName').value = ''; $('#fQty').value = ''; $('#fExp').value = '';
+    const row = { id: uid(), name, size: $('#fSize').value.trim(), count: Math.max(1, Number($('#fCount').value) || 1), foodCat: $('#fCat').value,
+      zone: $('#fZone').value, expiry: $('#fExp').value || '', list:'fridge', startDate: todayStr() };
+    $('#fName').value = ''; $('#fSize').value = ''; $('#fCount').value = '1'; $('#fExp').value = '';
     mutate(() => state.items.push(Object.assign({ done:false, createdAt: Date.now() }, row)), { action:'add', table:'items', rows:[row] });
   });
   $('#sAdd').addEventListener('submit', e => {
     e.preventDefault();
     const name = $('#sName').value.trim(); if(!name) return;
-    const row = { id: uid(), name, qty: $('#sQty').value.trim(), list:'shop' };
-    $('#sName').value = ''; $('#sQty').value = '';
+    const row = { id: uid(), name, size: $('#sSize').value.trim(), count: 1, list:'shop' };
+    $('#sName').value = ''; $('#sSize').value = '';
     mutate(() => state.items.push(Object.assign({ done:false, zone:'냉장', expiry:'', createdAt: Date.now() }, row)), { action:'add', table:'items', rows:[row] });
   });
   $('#moveIn').addEventListener('click', () => {
     const ids = state.items.filter(i => i.list === 'shop' && i.done).map(i => i.id);
     const p = { list:'fridge', done:false, createdAt: Date.now(), startDate: todayStr() };
     mutate(() => patchLocal('items', ids, p), { action:'update', table:'items', ids, patch:p });
-    setFtab('fridge');
   });
   $('#clearDone').addEventListener('click', () => {
     const ids = state.items.filter(i => i.list === 'shop' && i.done).map(i => i.id);
@@ -878,7 +981,7 @@ li.bad .tt{color:var(--bad)}
   /* ---------- 냉장고: 고치기 ---------- */
   function openEdit(item){
     state.editing = item.id;
-    $('#eName').value = item.name || ''; $('#eQty').value = item.qty || '';
+    $('#eName').value = item.name || ''; $('#eSize').value = sizeOf(item); $('#eCount').value = countOf(item); $('#eCat').value = catOf(item);
     $('#eZone').value = item.zone || '냉장'; $('#eExp').value = item.expiry || '';
     $('#eStart').value = item.startDate || (item.createdAt ? ymd(new Date(item.createdAt)) : '');
     armDelete($('#eDel'), () => { const id = state.editing; $('#editSheet').hidden = true; mutate(() => dropLocal('items',[id]), { action:'delete', table:'items', ids:[id] }); });
@@ -892,7 +995,14 @@ li.bad .tt{color:var(--bad)}
   $('#eSave').addEventListener('click', () => {
     const id = state.editing; if(!id) return;
     const name = $('#eName').value.trim(); if(!name){ $('#eName').focus(); return; }
-    const p = { name, qty: $('#eQty').value.trim(), zone: $('#eZone').value, expiry: $('#eExp').value || '', startDate: $('#eStart').value || '' };
+    const p = { name, size: $('#eSize').value.trim(), count: Math.max(0, Number($('#eCount').value) || 0), foodCat: $('#eCat').value,
+      zone: $('#eZone').value, expiry: $('#eExp').value || '', startDate: $('#eStart').value || '' };
+    if(p.count === 0){
+      // 0개로 고치면 다 쓴 것으로 처리 (다른 구매분이 없으면 장보기로)
+      const cur = state.items.find(x => x.id === id);
+      $('#editSheet').hidden = true;
+      return useOne(Object.assign({}, cur, { count: 1 }), state.items.filter(x => x.list === 'fridge' && prodKey(x) === prodKey(cur)));
+    }
     $('#editSheet').hidden = true;
     mutate(() => patchLocal('items',[id],p), { action:'update', table:'items', ids:[id], patch:p });
   });
@@ -917,25 +1027,46 @@ li.bad .tt{color:var(--bad)}
   }
   const imgPayload = list => list.map(p => ({ mime: p.mime, data: p.data }));
 
-  /* ---------- 냉장고: 사진으로 넣기 ---------- */
-  $('#camBtn').addEventListener('click', () => { $('#photoNew').value = ''; $('#photoNew').click(); });
-  $('#pMore').addEventListener('click', () => { $('#photoNew').value = ''; $('#photoNew').click(); });
-  // 연속 촬영: 사진마다 따로 읽고, 읽는 동안에도 다음 사진을 찍을 수 있습니다
+  /* ---------- 냉장고: 사진으로 넣기 ----------
+     한 제품: 앞면 → (선택) 날짜 면, 사진 2장을 합쳐 한 제품으로 읽습니다.
+     읽는 동안 다음 제품을 계속 찍을 수 있습니다. */
+  function shoot(stage){ state.shotStage = stage; $('#photoNew').value = ''; $('#photoNew').click(); }
+  $('#camBtn').addEventListener('click', () => { $('#photoSheet').hidden = false; paintDraft(); shoot('front'); });
+  $('#pNext').addEventListener('click', () => shoot('front'));
+  $('#dBack').addEventListener('click', () => shoot('back'));
+  $('#dGo').addEventListener('click', () => { const d = state.draft; state.draft = null; paintDraft(); runJob([d], 'product'); });
+  $('#pMulti').addEventListener('click', () => { $('#photoMulti').value = ''; $('#photoMulti').click(); });
+
   $('#photoNew').addEventListener('change', e => {
-    const files = Array.from(e.target.files || []).slice(0, 4);
-    if(!files.length) return;
+    const f = e.target.files && e.target.files[0]; if(!f) return;
     $('#photoSheet').hidden = false;
-    state.jobs++; paintJobs();
-    Promise.all(files.map(f => compress(f, 2000))).then(imgs => {
-      state.photos = state.photos.concat(imgs);
-      paintThumbs();
-      return post({ action:'analyze', images: imgPayload(imgs), mode:'items' });
-    }).then(items => {
-      (items || []).forEach(it => state.found.push(Object.assign({ on:true }, it)));
-      if(!(items || []).length) setPhotoMsg('한 장에서 식품을 찾지 못했습니다. 제품 이름이 보이게 다시 찍어 주세요.');
-    }).catch(err => setPhotoMsg(friendly(err)))
-    .then(() => { state.jobs--; paintJobs(); paintFound(); });
+    compress(f, 2000).then(img => {
+      if(state.shotStage === 'back' && state.draft){ const d = state.draft; state.draft = null; paintDraft(); runJob([d, img], 'product'); }
+      else { if(state.draft) runJob([state.draft], 'product'); state.draft = img; paintDraft(); }
+    }).catch(err => setPhotoMsg(friendly(err)));
   });
+  $('#photoMulti').addEventListener('change', e => {
+    const files = Array.from(e.target.files || []).slice(0, 4); if(!files.length) return;
+    $('#photoSheet').hidden = false;
+    Promise.all(files.map(f => compress(f, 2000))).then(imgs => runJob(imgs, 'items')).catch(err => setPhotoMsg(friendly(err)));
+  });
+
+  function runJob(imgs, mode){
+    state.jobs++; paintJobs();
+    post({ action:'analyze', images: imgPayload(imgs), mode })
+      .then(items => {
+        (items || []).forEach(it => state.found.push(Object.assign({ on:true, thumbs: imgs.map(x => x.preview) }, it)));
+        if(!(items || []).length) setPhotoMsg('사진에서 식품을 찾지 못했습니다. 제품 이름이 보이게 다시 찍어 주세요.');
+        else setPhotoMsg('');
+      })
+      .catch(err => setPhotoMsg(friendly(err)))
+      .then(() => { state.jobs--; paintJobs(); paintFound(); });
+  }
+  function paintDraft(){
+    $('#draft').hidden = !state.draft; $('#shoot').hidden = !!state.draft;
+    if(state.draft) $('#draftImg').src = state.draft.preview;
+  }
+
   $('#photoDate').addEventListener('change', e => {
     const f = e.target.files && e.target.files[0]; if(!f) return;
     const target = dateTarget;
@@ -960,12 +1091,11 @@ li.bad .tt{color:var(--bad)}
 
   function paintJobs(){
     $('#photoBusy').hidden = !state.jobs;
-    $('#busyText').textContent = '사진 ' + state.jobs + '장 읽는 중… 그동안 다음 사진을 계속 찍어도 됩니다.';
+    $('#busyText').textContent = '제품 ' + state.jobs + '개 읽는 중… 그동안 다음 제품을 계속 찍어도 됩니다.';
     countSave();
   }
   function setPhotoMsg(t){ const m = $('#photoMsg'); m.textContent = t || ''; m.hidden = !t; }
-  function paintThumbs(){ const t = $('#thumbs'); t.innerHTML = ''; state.photos.forEach(p => { const i = document.createElement('img'); i.src = p.preview; i.alt = ''; t.append(i); }); }
-  function closePhoto(){ if(state.jobs) return; $('#photoSheet').hidden = true; state.photos = []; state.found = []; setPhotoMsg(''); $('#thumbs').innerHTML = ''; $('#found').innerHTML = ''; }
+  function closePhoto(){ if(state.jobs) return; $('#photoSheet').hidden = true; state.draft = null; paintDraft(); state.found = []; setPhotoMsg(''); $('#found').innerHTML = ''; }
   $('#pCancel').addEventListener('click', closePhoto);
 
   function paintFound(){
@@ -976,8 +1106,11 @@ li.bad .tt{color:var(--bad)}
       cb.addEventListener('change', () => { it.on = cb.checked; card.classList.toggle('off', !it.on); countSave(); });
       const f = el('div','fields');
       const mk = (type, val, id, label, on) => { const x = document.createElement('input'); x.type = type; x.value = val || ''; x.id = id; x.setAttribute('aria-label', label); x.addEventListener('input', () => on(x.value)); return x; };
-      const name = mk('text', it.name, 'f-name-' + idx, '이름', v => it.name = v); name.className = 'full';
-      const qty = mk('text', it.qty, 'f-qty-' + idx, '수량', v => it.qty = v);
+      const name = mk('text', it.name, 'f-name-' + idx, '제품명', v => it.name = v); name.className = 'full';
+      const size = mk('text', it.size, 'f-size-' + idx, '용량', v => it.size = v); size.placeholder = '용량';
+      const cnt = mk('number', it.count || 1, 'f-cnt-' + idx, '개수', v => it.count = Math.max(1, Number(v) || 1)); cnt.min = 1;
+      const cat = document.createElement('select'); cat.id = 'f-cat-' + idx; cat.setAttribute('aria-label','종류'); fillCats(cat);
+      cat.value = FOOD_CATS.includes(it.foodCat) ? it.foodCat : '기타'; cat.addEventListener('change', () => it.foodCat = cat.value);
       const zone = document.createElement('select'); zone.id = 'f-zone-' + idx; zone.setAttribute('aria-label','보관 위치');
       ZONES.forEach(z => { const o = document.createElement('option'); o.textContent = z; zone.append(o); });
       zone.value = it.zone; zone.addEventListener('change', () => it.zone = zone.value);
@@ -986,7 +1119,8 @@ li.bad .tt{color:var(--bad)}
       const db = el('button','mini','기한 사진'); db.type = 'button'; db.dataset.dateBtn = idx;
       db.addEventListener('click', () => { dateTarget = idx; $('#photoDate').value = ''; $('#photoDate').click(); });
       row.append(exp, db);
-      f.append(name, qty, zone, row);
+      f.append(name, size, cnt, cat, zone, row);
+      if(it.thumbs && it.thumbs.length){ const th = el('div','thumbs full'); it.thumbs.forEach(src => { const im = document.createElement('img'); im.src = src; im.alt = ''; th.append(im); }); f.prepend(th); }
       card.append(cb, f);
       const notes = [];
       if(it.startDate) notes.push('제조일 ' + fullDate(it.startDate));
@@ -1004,8 +1138,9 @@ li.bad .tt{color:var(--bad)}
   }
   $('#pSave').addEventListener('click', () => {
     const rows = state.found.filter(i => i.on && String(i.name).trim()).map(i => ({
-      id: uid(), name: String(i.name).trim(), qty: i.qty, zone: i.zone, expiry: i.expiry || '', list:'fridge', startDate: i.startDate || todayStr(), verified:'pending' }));
-    closePhoto(); setFtab('fridge');
+      id: uid(), name: String(i.name).trim(), size: i.size || '', count: i.count || 1, foodCat: i.foodCat || '기타',
+      zone: i.zone, expiry: i.expiry || '', list:'fridge', startDate: i.startDate || todayStr(), verified:'pending' }));
+    closePhoto();
     mutate(() => rows.forEach(r => state.items.push(Object.assign({ done:false, createdAt: Date.now() }, r))), { action:'add', table:'items', rows })
       .then(ok => {
         if(!ok || !rows.length) return;
@@ -1162,6 +1297,8 @@ li.bad .tt{color:var(--bad)}
     document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible' && wantLock && !lock) grab(); });
   }
 
+  fillCats($('#fCat')); fillCats($('#eCat'));
+
   /* ---------- 연결 화면 · 시작 ---------- */
   let started = false;
   function showConnect(msg){
@@ -1173,13 +1310,13 @@ li.bad .tt{color:var(--bad)}
     $('#connect').hidden = true; $('#app').hidden = false;
     paintToday();
     const h = location.hash.slice(1);
-    go(h === 'fridge' || h === 'care' ? h : 'home');
+    go(['fridge','todo','shop','care'].includes(h) ? h : 'home');
     refresh();
     if(!started){
       started = true;
       document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible' && !$('#app').hidden){ paintToday(); if(!anyOpen()) refresh(); } });
       setInterval(() => { if(document.visibilityState === 'visible' && !$('#app').hidden && !anyOpen() && !Object.keys(state.searching).length) refresh(); }, 30000);
-      window.addEventListener('hashchange', () => { const v = location.hash.slice(1); go(v === 'fridge' || v === 'care' ? v : 'home'); });
+      window.addEventListener('hashchange', () => { const v = location.hash.slice(1); go(['fridge','todo','shop','care'].includes(v) ? v : 'home'); });
     }
   }
   $('#cGo').addEventListener('click', () => {
