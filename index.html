@@ -510,7 +510,7 @@ li.bad .tt{color:var(--bad)}
     if(m.includes('GEMINI_429')) return 'AI 무료 사용량을 잠시 넘었습니다. 1~2분 뒤 다시 시도하거나 직접 입력해 주세요.';
     if(m.includes('GEMINI_404')) return 'AI 모델 이름을 찾지 못했습니다. Code.gs 맨 위 GEMINI_MODEL을 현재 제공되는 모델로 바꿔 주세요.';
     if(m.includes('GEMINI_400') || m.includes('GEMINI_403')) return 'API 키가 맞지 않거나 권한이 없습니다. (' + m.slice(0,120) + ')';
-    if(m.includes('GEMINI_')) return 'AI 서버가 응답하지 않았습니다. 잠시 후 다시 시도해 주세요.';
+    if(m.includes('GEMINI_')) return 'AI 서버가 응답하지 않았습니다. 잠시 후 다시 시도해 주세요. (' + m.slice(0,80) + ')';
     if(m.includes('PARSE')) return 'AI 결과를 정리하지 못했습니다. 다시 시도해 주세요.';
     if(m.includes('BAD_TABLE') || m.includes('UNKNOWN_ACTION')) return '앱스 스크립트가 예전 버전입니다. 새 Code.gs로 바꾸고 새 버전으로 다시 배포해 주세요.';
     return '처리하지 못했습니다. 인터넷 연결을 확인한 뒤 다시 시도해 주세요.';
