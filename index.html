@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>S-home</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="S-home">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#2b7a57">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<style>
+/* layout: 홈(냉장고·집관리 카드) → 각 화면. 넓은 화면은 2단, 좁은 화면은 탭/1단 */
+:root{
+  --bg:#edf2f0; --surface:#ffffff; --ink:#1b2928; --muted:#5f716f; --line:#d3dddb; --chip:#e1eae7;
+  --accent:#2b7a57; --accent-ink:#ffffff; --accent-soft:#d8ece2;
+  --care:#36618e; --care-soft:#dde7f2;
+  --warn:#b86e00; --warn-soft:#fbecd2; --bad:#c0392b; --bad-soft:#f8dcd6; --scrim:rgba(10,20,18,.45);
+  --display:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#121918; --surface:#1b2423; --ink:#e3ecea; --muted:#93a6a3; --line:#2c3938; --chip:#25302f;
+  --accent:#5fc093; --accent-ink:#0b1a13; --accent-soft:#1f3a2e;
+  --care:#8fb4dc; --care-soft:#1e2c3b;
+  --warn:#f0a840; --warn-soft:#3a2c14; --bad:#f07c66; --bad-soft:#3d211c; --scrim:rgba(0,0,0,.6); color-scheme:dark}}
+
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:calc(14px + env(safe-area-inset-top,0px)) calc(40px + env(safe-area-inset-bottom,0px));
+  -webkit-text-size-adjust:100%}
+[hidden]{display:none!important}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+
+/* 상단 */
+header.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+h1{font-family:var(--display);font-weight:400;font-size:1.9rem;line-height:1.1;margin:0;display:flex;align-items:center;gap:10px}
+h1 img{width:34px;height:34px;border-radius:9px}
+.today{color:var(--muted);font-size:.88rem}
+.back{border:1px solid var(--line);background:var(--surface);border-radius:10px;min-height:40px;padding:6px 12px;font-weight:500}
+.tools{display:flex;gap:8px;align-items:center}
+.ghost{background:transparent;border:1px solid var(--line);border-radius:10px;padding:8px 12px;min-height:40px}
+.ghost:hover{border-color:var(--muted)}
+.ghost.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.gear{width:40px;padding:0;display:inline-flex;align-items:center;justify-content:center}
+.gear svg{width:20px;height:20px}
+.status{padding:10px 14px;border-radius:10px;background:var(--warn-soft);color:var(--warn);font-size:.92rem}
+
+/* 홈 */
+#vHome{display:flex;flex-direction:column;gap:16px}
+#vHome[hidden]{display:none!important}
+.homegrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.homecard{all:unset;cursor:pointer;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:22px;display:flex;flex-direction:column;gap:14px;min-height:190px}
+.homecard:focus-visible{outline:2px solid var(--accent)}
+.homecard .ic{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center}
+.homecard .ic svg{width:28px;height:28px}
+.homecard.fr .ic{background:var(--accent-soft);color:var(--accent)}
+.homecard.ca .ic{background:var(--care-soft);color:var(--care)}
+.homecard h2{margin:0}
+.homecard p{margin:0;color:var(--muted);font-size:.92rem}
+.stats{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:999px;background:var(--chip);font-size:.85rem;font-variant-numeric:tabular-nums}
+.pill b{font-weight:600}
+.pill.bad{background:var(--bad-soft);color:var(--bad)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.ok{background:var(--accent-soft);color:var(--accent)}
+.pill.care{background:var(--care-soft);color:var(--care)}
+.agenda{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:8px}
+.agenda h3{font-family:var(--display);font-weight:400;font-size:1.2rem;margin:0}
+
+/* 공통 패널 */
+.tabs{display:none;background:var(--chip);border-radius:12px;padding:4px;gap:4px}
+.tabs button{flex:1;border:0;background:transparent;border-radius:9px;padding:10px;min-height:44px;font-weight:500;color:var(--muted)}
+.tabs button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.tabs .n{font-variant-numeric:tabular-nums;margin-left:4px;opacity:.75}
+.grid{display:grid;grid-template-columns:1.25fr 1fr;gap:18px;align-items:start}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+h2{font-family:var(--display);font-weight:400;font-size:1.45rem;margin:0}
+.count{color:var(--muted);font-size:.9rem;font-variant-numeric:tabular-nums}
+.empty{color:var(--muted);font-size:.92rem;padding:12px 4px;line-height:1.6;margin:0}
+.foot{color:var(--muted);font-size:.82rem;text-align:right}
+.foot a{color:var(--muted)}
+
+.camera{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:54px;border:1.5px dashed var(--accent);
+  background:var(--accent-soft);color:var(--accent);border-radius:12px;font-weight:600;font-size:1rem}
+.camera.care{border-color:var(--care);background:var(--care-soft);color:var(--care)}
+.camera svg{width:22px;height:22px;flex:none}
+.or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.8rem}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+
+form.add{display:grid;gap:8px}
+#fAdd{grid-template-columns:2fr 1fr 1fr 1.3fr auto}
+#sAdd{grid-template-columns:2fr 1fr auto}
+input,select,textarea{width:100%;min-width:0;min-height:44px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+textarea{min-height:96px;resize:vertical;line-height:1.5}
+input[type=checkbox]{width:22px;height:22px;min-height:0;padding:0;accent-color:var(--accent);flex:none}
+input::placeholder,textarea::placeholder{color:var(--muted)}
+.primary{background:var(--accent);color:var(--accent-ink);border:0;border-radius:10px;padding:8px 16px;min-height:44px;font-weight:600;white-space:nowrap}
+.primary.care{background:var(--care);color:var(--surface)}
+.primary:disabled,.ghost:disabled{opacity:.45;cursor:default}
+
+/* 냉장고 목록 */
+.zone{display:flex;flex-direction:column;gap:6px}
+.zone-label{font-size:.78rem;letter-spacing:.08em;color:var(--muted);display:flex;gap:8px;align-items:center}
+.zone-label::after{content:"";flex:1;height:1px;background:var(--line)}
+ul.list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.item{display:flex;align-items:center;gap:10px;padding:10px 2px;border-bottom:1px solid var(--line);min-height:52px}
+.item:last-child{border-bottom:0}
+.item .main{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.item .name{font-weight:500;overflow-wrap:anywhere}
+.item .qty{color:var(--muted);font-size:.85rem}
+.item .info{color:var(--muted);font-size:.78rem;line-height:1.4}
+.item .verifying{color:var(--accent);font-size:.78rem}
+.life{height:4px;border-radius:2px;background:var(--chip);overflow:hidden;max-width:220px}
+.life i{display:block;height:100%;background:var(--accent)}
+.life.warn i{background:var(--warn)} .life.bad i{background:var(--bad)}
+.dchip{flex:none;border:0;border-radius:8px;padding:4px 9px;font-size:.82rem;font-variant-numeric:tabular-nums;background:var(--chip);color:var(--muted);min-height:30px;text-align:right;line-height:1.25}
+.dchip small{display:block;font-size:.72rem;opacity:.85}
+.dchip.warn{background:var(--warn-soft);color:var(--warn);font-weight:600}
+.dchip.bad{background:var(--bad-soft);color:var(--bad);font-weight:600}
+.dchip.none{background:transparent;border:1px dashed var(--line)}
+.act{flex:none;border:1px solid var(--line);background:transparent;border-radius:9px;padding:6px 10px;font-size:.85rem;min-height:36px;color:var(--muted)}
+.act:hover{color:var(--ink);border-color:var(--muted)}
+.check{display:flex;align-items:center;gap:12px;flex:1;min-width:0;cursor:pointer}
+.item.done .name{text-decoration:line-through;color:var(--muted)}
+.x{flex:none;border:0;background:transparent;color:var(--muted);font-size:1.3rem;width:40px;height:40px;border-radius:8px}
+.x:hover{background:var(--chip);color:var(--ink)}
+.shop-actions{display:flex;flex-wrap:wrap;gap:8px}
+.shop-actions .primary{flex:1}
+.legend{font-size:.8rem;color:var(--muted)}
+
+/* 집관리 */
+.carebar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.carebar .left{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.assets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+.acard{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 16px 12px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.ahead{all:unset;cursor:pointer;display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.ahead:focus-visible{outline:2px solid var(--care);border-radius:8px}
+.ahead .t{font-family:var(--display);font-size:1.25rem;line-height:1.25}
+.ahead .m{color:var(--muted);font-size:.84rem;overflow-wrap:anywhere}
+.room{flex:none;font-size:.78rem;padding:3px 9px;border-radius:999px;background:var(--care-soft);color:var(--care)}
+.summ{font-size:.86rem;color:var(--muted);margin:0}
+ol.tasks{list-style:none;margin:0;padding:0;counter-reset:t}
+ol.tasks li{counter-increment:t;display:grid;grid-template-columns:1.6em 1fr auto;gap:4px 8px;align-items:center;padding:9px 0;border-top:1px solid var(--line)}
+ol.tasks li::before{content:counter(t) ".";color:var(--muted);font-variant-numeric:tabular-nums;align-self:start;padding-top:1px}
+.tbody{all:unset;cursor:pointer;min-width:0;display:flex;flex-direction:column;gap:1px}
+.tbody .tt{font-weight:500;overflow-wrap:anywhere}
+.tbody .ts{font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.tbody .ts .red{color:var(--bad);font-weight:600}
+li.bad .tt{color:var(--bad)}
+.tright{display:flex;align-items:center;gap:6px}
+.tstat{font-size:.78rem;font-variant-numeric:tabular-nums;padding:3px 8px;border-radius:7px;background:var(--chip);color:var(--muted);white-space:nowrap}
+.tstat.bad{background:var(--bad-soft);color:var(--bad);font-weight:600}
+.tstat.warn{background:var(--warn-soft);color:var(--warn);font-weight:600}
+.donebtn{border:1px solid var(--care);background:transparent;color:var(--care);border-radius:9px;padding:5px 10px;min-height:36px;font-size:.85rem;font-weight:500}
+.donebtn:hover{background:var(--care-soft)}
+.afoot{display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:10px}
+.afoot button{font-size:.85rem;min-height:36px;padding:5px 10px}
+.searching{display:flex;align-items:center;gap:10px;color:var(--care);font-size:.88rem;padding:6px 0}
+
+/* 팝업 */
+.sheet{position:fixed;inset:0;background:var(--scrim);display:flex;align-items:center;justify-content:center;z-index:20;
+  padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.sheet-card{background:var(--surface);border-radius:16px;padding:20px;width:100%;max-width:460px;max-height:100%;overflow:auto;display:flex;flex-direction:column;gap:12px}
+.sheet-card.wide{max-width:640px}
+.sheet h3{font-family:var(--display);font-weight:400;font-size:1.3rem;margin:0}
+.sheet label{display:flex;flex-direction:column;gap:4px;font-size:.85rem;color:var(--muted)}
+.sheet label input,.sheet label select,.sheet label textarea{color:var(--ink);font-size:1rem}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sheet-actions{display:flex;gap:8px;align-items:center;margin-top:4px;flex-wrap:wrap}
+.sheet-actions .spacer{flex:1}
+.danger{color:var(--bad);border-color:var(--bad-soft)}
+.danger.armed{background:var(--bad);color:var(--surface);border-color:var(--bad)}
+.quick{display:flex;flex-wrap:wrap;gap:6px}
+.quick button{border:1px solid var(--line);background:transparent;border-radius:999px;padding:4px 12px;font-size:.85rem;color:var(--muted);min-height:34px}
+.quick button:hover{color:var(--ink);border-color:var(--muted)}
+.row-exp{display:flex;gap:8px}
+.row-exp input{flex:1}
+.mini{flex:none;border:1px solid var(--accent);background:var(--accent-soft);color:var(--accent);border-radius:10px;padding:6px 10px;font-size:.85rem;min-height:44px;font-weight:500}
+.busy{display:flex;align-items:center;gap:12px;padding:14px 4px;color:var(--muted)}
+.spin{width:20px;height:20px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--accent);animation:spin .8s linear infinite;flex:none}
+.searching .spin{border-top-color:var(--care)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.thumbs{display:flex;gap:6px;overflow-x:auto}
+.thumbs img{width:64px;height:64px;object-fit:cover;border-radius:8px;flex:none;border:1px solid var(--line)}
+.found{display:flex;flex-direction:column;gap:10px}
+.fcard{border:1px solid var(--line);border-radius:12px;padding:12px;display:grid;grid-template-columns:auto 1fr;gap:8px 10px;align-items:start}
+.fcard.off{opacity:.5}
+.fcard .fields{display:grid;grid-template-columns:2fr 1fr;gap:8px;min-width:0}
+.fcard .fields .full{grid-column:1/-1}
+.fcard .note{grid-column:1/-1;font-size:.8rem;color:var(--warn)}
+.fcard input[type=checkbox]{margin-top:11px}
+.howto{background:var(--bg);border-radius:10px;padding:12px;font-size:.92rem;line-height:1.6;white-space:pre-wrap}
+.hist{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.hist li{display:inline-flex;align-items:center;gap:2px;background:var(--care-soft);color:var(--care);border-radius:8px;padding:2px 4px 2px 10px;font-size:.85rem;font-variant-numeric:tabular-nums}
+.hist button{border:0;background:transparent;color:inherit;width:28px;height:28px;border-radius:6px;font-size:1rem}
+.sources{display:flex;flex-direction:column;gap:4px;font-size:.85rem}
+.sources a{color:var(--care);overflow-wrap:anywhere}
+.suggest{width:100%;border:0;height:72px;background:transparent}
+.connect{max-width:440px;margin:8vh auto 0;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:12px}
+.connect p{margin:0;color:var(--muted);font-size:.92rem}
+.connect label{display:flex;flex-direction:column;gap:4px;font-size:.85rem;color:var(--muted)}
+.connect label input{color:var(--ink);font-size:1rem}
+.err{color:var(--bad);font-size:.9rem}
+
+@media (max-width:899px){
+  .tabs{display:flex}
+  .grid{grid-template-columns:1fr}
+  .grid .panel{display:none}
+  body[data-ftab="fridge"] #fridge, body[data-ftab="shop"] #shop{display:flex}
+  .assets{grid-template-columns:1fr}
+}
+@media (max-width:600px){
+  h1{font-size:1.55rem}
+  .homegrid{grid-template-columns:1fr}
+  .homecard{min-height:0}
+  #fAdd{grid-template-columns:1fr 1fr}
+  #fAdd #fName{grid-column:1/-1}
+  #fAdd .primary{grid-column:1/-1}
+  #sAdd{grid-template-columns:1fr 90px auto}
+  .panel{padding:14px}
+  .fcard .fields{grid-template-columns:1fr 1fr}
+  .two{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){.spin{animation:none}}
+</style>
+</head>
+<body data-view="home">
+
+<!-- 처음 연결 -->
+<div class="connect" id="connect" hidden>
+  <h2>S-home 연결</h2>
+  <p>구글 앱스 스크립트를 배포할 때 받은 웹 앱 URL과, 스크립트 속성에 넣은 APP_PASSWORD를 입력해 주세요. 이 기기에 한 번만 입력하면 됩니다.</p>
+  <label>웹 앱 URL<input id="cUrl" type="url" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off"></label>
+  <label>비밀번호<input id="cPw" type="password" autocomplete="current-password"></label>
+  <div class="err" id="cErr" hidden></div>
+  <button class="primary" type="button" id="cGo">연결하기</button>
+</div>
+
+<div class="wrap" id="app" hidden>
+  <header class="top">
+    <div class="brand">
+      <button class="back" type="button" id="back" hidden>‹ 홈</button>
+      <div>
+        <h1 id="title"><img src="icon-180.png" alt="">S-home</h1>
+        <div class="today" id="today"></div>
+      </div>
+    </div>
+    <div class="tools">
+      <button class="ghost" id="wake" type="button" hidden>화면 켜두기</button>
+      <button class="ghost gear" id="gear" type="button" aria-label="연결 설정">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="status" id="status" hidden></div>
+
+  <!-- 홈 -->
+  <section id="vHome">
+    <div class="homegrid">
+      <button class="homecard fr" type="button" id="goFridge">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="5" y="2.5" width="14" height="19" rx="2.5"/><path d="M5 9.5h14M8.5 5.5v2M8.5 12.5v3"/></svg></span>
+        <div><h2>냉장고</h2><p>재고 · 유통기한 · 장보기</p></div>
+        <div class="stats" id="hsFridge"></div>
+      </button>
+      <button class="homecard ca" type="button" id="goCare">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></svg></span>
+        <div><h2>집관리</h2><p>가전 · 가구 청소와 교체 일정</p></div>
+        <div class="stats" id="hsCare"></div>
+      </button>
+    </div>
+    <div class="agenda" id="agenda" hidden>
+      <h3>지금 챙길 것</h3>
+      <ul class="list" id="agendaList"></ul>
+    </div>
+  </section>
+
+  <!-- 냉장고 -->
+  <section id="vFridge" hidden>
+    <div class="wrap">
+      <nav class="tabs" role="tablist">
+        <button type="button" role="tab" id="tabFridge" data-ftab="fridge">냉장고<span class="n" id="nFridge"></span></button>
+        <button type="button" role="tab" id="tabShop" data-ftab="shop">장보기<span class="n" id="nShop"></span></button>
+      </nav>
+      <main class="grid">
+        <section class="panel" id="fridge" aria-labelledby="hFridge">
+          <div class="panel-head"><h2 id="hFridge">냉장고</h2><div class="stats" id="fStats"></div></div>
+          <button class="camera" type="button" id="camBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+            사진으로 넣기
+          </button>
+          <div class="or">직접 입력</div>
+          <form class="add" id="fAdd" autocomplete="off">
+            <input id="fName" placeholder="넣을 것 (예: 우유)" aria-label="이름" required>
+            <input id="fQty" placeholder="수량" aria-label="수량">
+            <select id="fZone" aria-label="보관 위치"><option>냉장</option><option>냉동</option><option>실온</option></select>
+            <input id="fExp" type="date" aria-label="유통기한">
+            <button class="primary" type="submit">넣기</button>
+          </form>
+          <div id="fridgeBody"></div>
+          <div class="legend">막대는 전체 기간 중 남은 비율입니다. 50% 이하 주황, 20% 이하 빨강.</div>
+        </section>
+        <section class="panel" id="shop" aria-labelledby="hShop">
+          <div class="panel-head"><h2 id="hShop">장보기</h2><span class="count" id="cShop"></span></div>
+          <form class="add" id="sAdd" autocomplete="off">
+            <input id="sName" placeholder="살 것 (예: 계란)" aria-label="이름" required>
+            <input id="sQty" placeholder="수량" aria-label="수량">
+            <button class="primary" type="submit">추가</button>
+          </form>
+          <div id="shopBody"></div>
+          <div class="shop-actions" id="shopActions" hidden>
+            <button class="primary" type="button" id="moveIn"></button>
+            <button class="ghost" type="button" id="clearDone">체크한 것 지우기</button>
+          </div>
+        </section>
+      </main>
+    </div>
+  </section>
+
+  <!-- 집관리 -->
+  <section id="vCare" hidden>
+    <div class="wrap">
+      <div class="carebar">
+        <div class="left">
+          <div class="stats" id="cStats"></div>
+          <button class="ghost" type="button" id="onlyDue" aria-pressed="false">해야 할 것만</button>
+        </div>
+        <button class="primary care" type="button" id="addAsset">물건 추가</button>
+      </div>
+      <div class="assets" id="assets"></div>
+    </div>
+  </section>
+
+  <div class="foot"><a id="sheetLink" href="#" target="_blank" rel="noopener" hidden>구글 시트에서 원본 보기</a></div>
+</div>
+
+<input type="file" id="photoNew" accept="image/*" multiple hidden>
+<input type="file" id="photoDate" accept="image/*" hidden>
+<input type="file" id="photoAsset" accept="image/*" multiple hidden>
+
+<datalist id="rooms"><option>거실</option><option>주방</option><option>안방</option><option>작은방</option><option>아이방</option><option>욕실</option><option>베란다</option><option>다용도실</option><option>현관</option></datalist>
+
+<!-- 냉장고 항목 고치기 -->
+<div class="sheet" id="editSheet" hidden role="dialog" aria-modal="true" aria-labelledby="editTitle">
+  <div class="sheet-card">
+    <h3 id="editTitle">항목 고치기</h3>
+    <label>이름<input id="eName"></label>
+    <div class="two">
+      <label>수량<input id="eQty"></label>
+      <label>보관 위치<select id="eZone"><option>냉장</option><option>냉동</option><option>실온</option></select></label>
+    </div>
+    <label>유통기한(소비기한)
+      <span class="row-exp"><input id="eExp" type="date"><button type="button" class="mini" id="eExpPhoto">사진으로 읽기</button></span>
+    </label>
+    <div class="quick" id="quick">
+      <button type="button" data-d="3">+3일</button><button type="button" data-d="7">+1주</button>
+      <button type="button" data-d="30">+1달</button><button type="button" data-d="180">+6달</button>
+      <button type="button" data-d="365">+1년</button><button type="button" data-d="">기한 없음</button>
+    </div>
+    <label>제조일 또는 산 날 (남은 % 계산의 시작점)<input id="eStart" type="date"></label>
+    <div class="sheet-actions">
+      <button class="ghost danger" type="button" id="eDel">삭제</button>
+      <span class="spacer"></span>
+      <button class="ghost" type="button" id="eCancel">닫기</button>
+      <button class="primary" type="button" id="eSave">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 식료품 사진 결과 -->
+<div class="sheet" id="photoSheet" hidden role="dialog" aria-modal="true" aria-labelledby="photoTitle">
+  <div class="sheet-card wide">
+    <h3 id="photoTitle">사진에서 찾은 것</h3>
+    <div class="thumbs" id="thumbs"></div>
+    <div id="photoBusy" class="busy"><span class="spin"></span><span id="busyText"></span></div>
+    <div id="photoMsg" class="empty" hidden></div>
+    <div class="found" id="found"></div>
+    <div class="sheet-actions">
+      <button class="ghost" type="button" id="pMore">다음 사진 찍기</button>
+      <span class="spacer"></span>
+      <button class="ghost" type="button" id="pCancel">닫기</button>
+      <button class="primary" type="button" id="pSave" disabled>냉장고에 넣기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 물건 추가·고치기 -->
+<div class="sheet" id="assetSheet" hidden role="dialog" aria-modal="true" aria-labelledby="assetTitle">
+  <div class="sheet-card">
+    <h3 id="assetTitle">물건 추가</h3>
+    <button class="camera care" type="button" id="aPhoto">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+      <span id="aPhotoText">제품이나 모델명 라벨 사진으로 입력</span>
+    </button>
+    <label>이름<input id="aName" placeholder="예: 드럼세탁기"></label>
+    <div class="two">
+      <label>제조사<input id="aBrand" placeholder="예: LG전자"></label>
+      <label>모델명<input id="aModel" placeholder="라벨에 적힌 그대로"></label>
+    </div>
+    <div class="two">
+      <label>종류<select id="aCat"><option>가전</option><option>가구</option><option>기타</option></select></label>
+      <label>위치<input id="aRoom" list="rooms" placeholder="예: 다용도실"></label>
+    </div>
+    <div id="aInfo" hidden>
+      <div class="summ" id="aUpdated"></div>
+      <div class="sources" id="aSources"></div>
+      <iframe class="suggest" id="aSuggest" sandbox="allow-popups allow-popups-to-escape-sandbox" title="Google 검색 추천" hidden></iframe>
+    </div>
+    <div class="sheet-actions">
+      <button class="ghost danger" type="button" id="aDel" hidden>삭제</button>
+      <span class="spacer"></span>
+      <button class="ghost" type="button" id="aCancel">닫기</button>
+      <button class="primary care" type="button" id="aSave">추가하고 관리법 찾기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 관리 작업 상세 -->
+<div class="sheet" id="taskSheet" hidden role="dialog" aria-modal="true" aria-labelledby="taskTitle">
+  <div class="sheet-card">
+    <h3 id="taskTitle">관리 작업</h3>
+    <div class="summ" id="tAsset"></div>
+    <label>작업 이름<input id="tName" placeholder="예: 배수필터 청소"></label>
+    <label>권장 주기 (일)
+      <input id="tInterval" type="number" min="1" max="3650" inputmode="numeric">
+    </label>
+    <div class="quick" id="tQuick">
+      <button type="button" data-i="7">1주</button><button type="button" data-i="14">2주</button>
+      <button type="button" data-i="30">1개월</button><button type="button" data-i="90">3개월</button>
+      <button type="button" data-i="180">6개월</button><button type="button" data-i="365">1년</button>
+    </div>
+    <label>방법<textarea id="tHow" placeholder="어떻게 하는지 적어 두세요"></textarea></label>
+    <div id="tHistWrap">
+      <div class="summ">수행 기록 (× 를 누르면 지워집니다)</div>
+      <ul class="hist" id="tHist"></ul>
+    </div>
+    <div class="sheet-actions">
+      <button class="ghost danger" type="button" id="tDel">삭제</button>
+      <span class="spacer"></span>
+      <button class="ghost" type="button" id="tCancel">닫기</button>
+      <button class="primary care" type="button" id="tSave">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 완료 기록 -->
+<div class="sheet" id="doneSheet" hidden role="dialog" aria-modal="true" aria-labelledby="doneTitle">
+  <div class="sheet-card">
+    <h3 id="doneTitle">언제 했나요?</h3>
+    <div class="summ" id="dTask"></div>
+    <div class="quick" id="dQuick">
+      <button type="button" data-b="0">오늘</button><button type="button" data-b="1">어제</button>
+      <button type="button" data-b="2">그저께</button><button type="button" data-b="7">일주일 전</button>
+    </div>
+    <label>날짜<input id="dDate" type="date"></label>
+    <div class="sheet-actions">
+      <span class="spacer"></span>
+      <button class="ghost" type="button" id="dCancel">닫기</button>
+      <button class="primary care" type="button" id="dSave">기록하기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const $ = s => document.querySelector(s);
+  const ZONES = ['냉장','냉동','실온'];
+  const state = { items: [], assets: [], tasks: [], ready: false, view: 'home', onlyDue: false,
+    editing: null, photos: [], found: [], jobs: 0, assetEditing: null, taskEditing: null, taskDraftHist: [], doneTask: null, searching: {} };
+  let dateTarget = null;
+
+  /* ---------- 연결 정보 (이 기기에만 저장) ---------- */
+  let conn = {};
+  try { conn = JSON.parse(localStorage.getItem('s-home-conn') || '{}'); } catch(e){ conn = {}; }
+  const saveConn = () => { try { localStorage.setItem('s-home-conn', JSON.stringify(conn)); } catch(e){} };
+
+  /* ---------- 서버 ---------- */
+  function post(body){
+    body.password = conn.pw;
+    // text/plain으로 보내야 구글 서버가 GitHub 주소에서 온 요청을 받아 줍니다
+    return fetch(conn.url, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body: JSON.stringify(body), redirect:'follow' })
+      .then(r => { if(!r.ok) throw new Error('HTTP_' + r.status); return r.json(); })
+      .then(j => {
+        if(!j.ok){
+          if(String(j.error).indexOf('WRONG_PASSWORD') >= 0) showConnect('비밀번호가 바뀌었거나 맞지 않습니다. 다시 입력해 주세요.');
+          throw new Error(j.error || 'SERVER');
+        }
+        return j.data;
+      });
+  }
+  function friendly(err){
+    const m = String((err && err.message) || err || '');
+    if(m.includes('WRONG_PASSWORD')) return '비밀번호가 맞지 않습니다.';
+    if(m.includes('NO_PASSWORD_SET')) return '앱스 스크립트의 스크립트 속성에 APP_PASSWORD가 아직 없습니다.';
+    if(m.includes('NO_KEY')) return 'Gemini API 키가 아직 등록되지 않았습니다. 앱스 스크립트의 스크립트 속성에 GEMINI_API_KEY를 넣어 주세요.';
+    if(m.includes('GEMINI_429')) return 'AI 무료 사용량을 잠시 넘었습니다. 1~2분 뒤 다시 시도하거나 직접 입력해 주세요.';
+    if(m.includes('GEMINI_404')) return 'AI 모델 이름을 찾지 못했습니다. Code.gs 맨 위 GEMINI_MODEL을 현재 제공되는 모델로 바꿔 주세요.';
+    if(m.includes('GEMINI_400') || m.includes('GEMINI_403')) return 'API 키가 맞지 않거나 권한이 없습니다. (' + m.slice(0,120) + ')';
+    if(m.includes('GEMINI_')) return 'AI 서버가 응답하지 않았습니다. 잠시 후 다시 시도해 주세요.';
+    if(m.includes('PARSE')) return 'AI 결과를 정리하지 못했습니다. 다시 시도해 주세요.';
+    if(m.includes('BAD_TABLE') || m.includes('UNKNOWN_ACTION')) return '앱스 스크립트가 예전 버전입니다. 새 Code.gs로 바꾸고 새 버전으로 다시 배포해 주세요.';
+    return '처리하지 못했습니다. 인터넷 연결을 확인한 뒤 다시 시도해 주세요.';
+  }
+  const setStatus = msg => { const el = $('#status'); el.textContent = msg || ''; el.hidden = !msg; };
+  function setAll(d){
+    if(!d) return;
+    state.items = d.items || []; state.assets = d.assets || []; state.tasks = d.tasks || [];
+    if(d.sheetUrl){ $('#sheetLink').href = d.sheetUrl; $('#sheetLink').hidden = false; }
+    state.ready = true;
+  }
+  function mutate(local, payload){
+    if(local){ local(); render(); }
+    return post(payload).then(d => { setAll(d); setStatus(''); render(); return true; })
+      .catch(err => { setStatus(friendly(err)); refresh(); return false; });
+  }
+  function refresh(){
+    return post({ action:'all' }).then(d => { setAll(d); render(); })
+      .catch(() => { state.ready = true; render(); setStatus('목록을 불러오지 못했습니다. 인터넷 연결을 확인해 주세요.'); });
+  }
+  const uid = () => (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : 'id' + Date.now() + Math.random().toString(16).slice(2);
+
+  /* ---------- 날짜 ---------- */
+  const pad = n => (n < 10 ? '0' : '') + n;
+  const ymd = d => d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+  const todayStr = () => ymd(new Date());
+  function toUTC(s){ const p = s.split('-').map(Number); return Date.UTC(p[0], p[1]-1, p[2]); }
+  const diff = (a, b) => Math.round((toUTC(b) - toUTC(a)) / 86400000); // a→b 일수
+  function addDays(s, n){ const p = s.split('-').map(Number); return ymd(new Date(p[0], p[1]-1, p[2] + Number(n))); }
+  const shortDate = s => { const p = s.split('-'); return Number(p[1]) + '.' + Number(p[2]); };
+  const fullDate = s => { const p = s.split('-'); return p[0] + '.' + Number(p[1]) + '.' + Number(p[2]); };
+  const WD = ['일','월','화','수','목','금','토'];
+  function paintToday(){ const d = new Date(); $('#today').textContent = (d.getMonth()+1) + '월 ' + d.getDate() + '일 ' + WD[d.getDay()] + '요일'; }
+  function spanText(days){
+    if(days >= 365 && days % 365 === 0) return (days/365) + '년';
+    if(days >= 30 && days % 30 === 0) return (days/30) + '개월';
+    if(days >= 7 && days % 7 === 0) return (days/7) + '주';
+    return days + '일';
+  }
+  function leftText(days){
+    if(days > 60) return '약 ' + Math.round(days/30) + '개월';
+    return 'D-' + days;
+  }
+
+  /* ---------- 유통기한: 남은 비율 ---------- */
+  function life(item){
+    if(!item.expiry) return null;
+    const t = todayStr();
+    const start = item.startDate || (item.createdAt ? ymd(new Date(item.createdAt)) : t);
+    const total = Math.max(1, diff(start, item.expiry));
+    const left = diff(t, item.expiry);
+    const pct = Math.max(0, Math.min(100, Math.round(left / total * 100)));
+    const cls = left < 0 || pct <= 20 ? 'bad' : pct <= 50 ? 'warn' : 'ok';
+    return { left, pct, cls };
+  }
+
+  /* ---------- 관리 작업 상태 ---------- */
+  function taskState(t){
+    const iv = Number(t.intervalDays) || 30;
+    if(!t.lastDone) return { cls:'bad', label:'기록 없음', rank:-1e6, next:null };
+    const next = addDays(t.lastDone, iv), left = diff(todayStr(), next);
+    if(left < 0) return { cls:'bad', label:(-left) + '일 지남', rank:left, next };
+    if(left === 0) return { cls:'bad', label:'오늘', rank:0, next };
+    if(left <= Math.max(2, Math.round(iv * 0.2))) return { cls:'warn', label:leftText(left), rank:left, next };
+    return { cls:'', label:leftText(left), rank:left, next };
+  }
+  const assetOf = id => state.assets.find(a => a.id === id);
+  const tasksOf = id => state.tasks.filter(t => t.assetId === id);
+
+  /* ---------- 화면 이동 ---------- */
+  let ftab = 'fridge';
+  try { ftab = localStorage.getItem('s-home-ftab') || 'fridge'; } catch(e){}
+  function setFtab(t){
+    ftab = t; document.body.dataset.ftab = t;
+    $('#tabFridge').setAttribute('aria-selected', t === 'fridge');
+    $('#tabShop').setAttribute('aria-selected', t === 'shop');
+    try { localStorage.setItem('s-home-ftab', t); } catch(e){}
+  }
+  document.querySelectorAll('.tabs button').forEach(b => b.addEventListener('click', () => setFtab(b.dataset.ftab)));
+  setFtab(ftab);
+
+  function go(view){
+    state.view = view; document.body.dataset.view = view;
+    $('#vHome').hidden = view !== 'home'; $('#vFridge').hidden = view !== 'fridge'; $('#vCare').hidden = view !== 'care';
+    $('#back').hidden = view === 'home';
+    const h = $('#title');
+    h.innerHTML = '';
+    if(view === 'home'){ const img = document.createElement('img'); img.src = 'icon-180.png'; img.alt = ''; h.append(img, 'S-home'); }
+    else h.textContent = view === 'fridge' ? '냉장고' : '집관리';
+    if(location.hash.slice(1) !== (view === 'home' ? '' : view)) history.replaceState(null, '', view === 'home' ? location.pathname : '#' + view);
+    window.scrollTo(0, 0);
+    render();
+  }
+  $('#back').addEventListener('click', () => go('home'));
+  $('#goFridge').addEventListener('click', () => go('fridge'));
+  $('#goCare').addEventListener('click', () => go('care'));
+
+  /* ---------- 그리기 ---------- */
+  function el(tag, cls, text){ const e = document.createElement(tag); if(cls) e.className = cls; if(text != null) e.textContent = text; return e; }
+  function pill(cls, label, n){ const p = el('span', 'pill ' + cls); p.append(label + ' '); p.append(el('b', null, n + '개')); return p; }
+  const patchLocal = (list, ids, patch) => state[list].forEach(i => { if(ids.includes(i.id)) Object.assign(i, patch); });
+  const dropLocal = (list, ids) => { state[list] = state[list].filter(i => !ids.includes(i.id)); };
+
+  function fridgeCounts(){
+    const fridge = state.items.filter(i => i.list === 'fridge');
+    let over = 0, bad = 0, warn = 0;
+    fridge.forEach(i => { const l = life(i); if(!l) return; if(l.left < 0) over++; else if(l.cls === 'bad') bad++; else if(l.cls === 'warn') warn++; });
+    const shop = state.items.filter(i => i.list === 'shop' && !i.done).length;
+    return { fridge, over, bad, warn, shop };
+  }
+  function careCounts(){
+    let none = 0, late = 0, soon = 0;
+    state.tasks.forEach(t => { const s = taskState(t); if(!t.lastDone) none++; else if(s.cls === 'bad') late++; else if(s.cls === 'warn') soon++; });
+    return { none, late, soon };
+  }
+
+  function render(){
+    if(state.view === 'home') renderHome();
+    if(state.view === 'fridge') renderFridge();
+    if(state.view === 'care') renderCare();
+  }
+
+  function renderHome(){
+    const f = fridgeCounts(), c = careCounts();
+    const hf = $('#hsFridge'); hf.innerHTML = '';
+    if(!state.ready) hf.append(el('span','pill','불러오는 중…'));
+    else {
+      if(f.over) hf.append(pill('bad','기한 지남', f.over));
+      if(f.bad) hf.append(pill('bad','20% 이하', f.bad));
+      if(f.warn) hf.append(pill('warn','50% 이하', f.warn));
+      hf.append(pill('ok','살 것', f.shop));
+    }
+    const hc = $('#hsCare'); hc.innerHTML = '';
+    if(!state.ready) hc.append(el('span','pill','불러오는 중…'));
+    else if(!state.assets.length) hc.append(el('span','pill care','물건을 추가해 주세요'));
+    else {
+      if(c.late) hc.append(pill('bad','해야 할 일', c.late));
+      if(c.none) hc.append(pill('bad','기록 없음', c.none));
+      if(c.soon) hc.append(pill('warn','곧 할 일', c.soon));
+      if(!c.late && !c.none && !c.soon) hc.append(el('span','pill care','모두 챙겼어요'));
+    }
+
+    // 지금 챙길 것: 기한 20% 이하 식품 + 주기가 지난 관리 작업
+    const rows = [];
+    f.fridge.forEach(i => { const l = life(i); if(l && l.cls === 'bad') rows.push({ kind:'f', i, rank:l.left, label: l.left < 0 ? (-l.left) + '일 지남' : leftText(l.left) + ' · ' + l.pct + '%' }); });
+    state.tasks.forEach(t => { const s = taskState(t); if(t.lastDone && s.cls === 'bad'){ const a = assetOf(t.assetId); rows.push({ kind:'t', t, rank:s.rank, label:s.label, name:(a ? a.name + ' · ' : '') + t.title }); } });
+    rows.sort((a,b) => a.rank - b.rank);
+    const ul = $('#agendaList'); ul.innerHTML = '';
+    rows.slice(0, 8).forEach(r => {
+      const li = el('li','item');
+      const main = el('div','main');
+      main.append(el('span','name', r.kind === 'f' ? r.i.name : r.name));
+      main.append(el('span','qty', r.kind === 'f' ? '냉장고 · ' + (r.i.zone || '냉장') : '집관리'));
+      const chip = el('span','tstat bad', r.label);
+      const btn = el('button','act', r.kind === 'f' ? '보기' : '완료');
+      btn.type = 'button';
+      btn.addEventListener('click', () => r.kind === 'f' ? (go('fridge'), openEdit(r.i)) : openDone(r.t));
+      li.append(main, chip, btn); ul.append(li);
+    });
+    $('#agenda').hidden = !rows.length;
+  }
+
+  function lifeChip(item){
+    const l = life(item), b = el('button','dchip'); b.type = 'button';
+    if(!l){ b.classList.add('none'); b.textContent = '기한 입력'; }
+    else {
+      if(l.cls !== 'ok') b.classList.add(l.cls);
+      if(l.left < 0) b.textContent = (-l.left) + '일 지남';
+      else { b.append(l.left === 0 ? '오늘까지' : leftText(l.left)); b.append(el('small', null, '남은 ' + l.pct + '%')); }
+      b.title = item.expiry + ' 까지';
+    }
+    b.addEventListener('click', () => openEdit(item));
+    return b;
+  }
+
+  function renderFridge(){
+    const f = fridgeCounts();
+    const shop = state.items.filter(i => i.list === 'shop');
+    const open = shop.filter(i => !i.done), done = shop.filter(i => i.done);
+    const fs = $('#fStats'); fs.innerHTML = '';
+    if(f.over) fs.append(pill('bad','지남', f.over));
+    if(f.bad) fs.append(pill('bad','20% 이하', f.bad));
+    if(f.warn) fs.append(pill('warn','50% 이하', f.warn));
+    if(state.ready && !f.over && !f.bad && !f.warn) fs.append(el('span','count', f.fridge.length + '개'));
+    $('#nFridge').textContent = f.fridge.length || '';
+    $('#nShop').textContent = open.length || '';
+    $('#cShop').textContent = state.ready ? open.length + '개 남음' : '';
+
+    const fb = $('#fridgeBody'); fb.innerHTML = '';
+    if(!f.fridge.length){
+      fb.append(el('p','empty', state.ready
+        ? '냉장고가 비어 있습니다. "사진으로 넣기"로 포장이나 영수증을 찍으면 제품명과 유통기한이 채워지고, 남은 기간 비율이 낮은 것부터 보입니다.'
+        : '목록을 불러오는 중입니다…'));
+    }
+    ZONES.forEach(z => {
+      const items = f.fridge.filter(i => (i.zone || '냉장') === z).sort((a,b) => {
+        const la = life(a), lb = life(b);
+        if(!la && lb) return 1; if(!lb && la) return -1;
+        if(la && lb){ const ka = la.left < 0 ? -1000 + la.left : la.pct, kb = lb.left < 0 ? -1000 + lb.left : lb.pct; if(ka !== kb) return ka - kb; }
+        return String(a.name).localeCompare(String(b.name), 'ko');
+      });
+      if(!items.length) return;
+      const box = el('div','zone'); box.append(el('div','zone-label', z + ' · ' + items.length));
+      const ul = el('ul','list');
+      items.forEach(i => {
+        const li = el('li','item'), main = el('div','main');
+        main.append(el('span','name', i.name));
+        if(i.qty) main.append(el('span','qty', i.qty));
+        if(i.verified === 'pending' && Date.now() - (i.createdAt || 0) < 5 * 60000) main.append(el('span','verifying','제품명 확인 중…'));
+        else if(i.info) main.append(el('span','info', i.info));
+        const l = life(i);
+        if(l){ const bar = el('div','life ' + l.cls); const fill = el('i'); fill.style.width = (l.left < 0 ? 100 : l.pct) + '%'; bar.append(fill); main.append(bar); }
+        const used = el('button','act','다 씀'); used.type = 'button'; used.title = '장보기 목록으로 옮깁니다';
+        used.addEventListener('click', () => { const p = { list:'shop', done:false, expiry:'', startDate:'' }; mutate(() => patchLocal('items',[i.id],p), { action:'update', table:'items', ids:[i.id], patch:p }); });
+        li.append(main, lifeChip(i), used);
+        ul.append(li);
+      });
+      box.append(ul); fb.append(box);
+    });
+
+    const sb = $('#shopBody'); sb.innerHTML = '';
+    if(!shop.length){
+      sb.append(el('p','empty', state.ready ? '살 것이 없습니다. 위 칸에 적거나, 냉장고에서 "다 씀"을 누르면 여기로 옮겨집니다.' : '목록을 불러오는 중입니다…'));
+    } else {
+      const byTime = (a,b) => (a.createdAt||0) - (b.createdAt||0);
+      const ul = el('ul','list');
+      open.sort(byTime).concat(done.sort(byTime)).forEach(i => {
+        const li = el('li','item' + (i.done ? ' done' : ''));
+        const lab = el('label','check');
+        const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = !!i.done; cb.id = 'c-' + i.id;
+        cb.addEventListener('change', () => { const p = { done: cb.checked }; mutate(() => patchLocal('items',[i.id],p), { action:'update', table:'items', ids:[i.id], patch:p }); });
+        const main = el('span','main'); main.append(el('span','name', i.name));
+        if(i.qty) main.append(el('span','qty', i.qty));
+        lab.append(cb, main);
+        const x = el('button','x','×'); x.type = 'button'; x.setAttribute('aria-label', i.name + ' 지우기');
+        x.addEventListener('click', () => mutate(() => dropLocal('items',[i.id]), { action:'delete', table:'items', ids:[i.id] }));
+        li.append(lab, x); ul.append(li);
+      });
+      sb.append(ul);
+    }
+    $('#shopActions').hidden = !done.length;
+    $('#moveIn').textContent = '산 것 냉장고에 넣기 (' + done.length + ')';
+  }
+
+  function renderCare(){
+    const c = careCounts();
+    const cs = $('#cStats'); cs.innerHTML = '';
+    if(c.late) cs.append(pill('bad','해야 할 일', c.late));
+    if(c.none) cs.append(pill('bad','기록 없음', c.none));
+    if(c.soon) cs.append(pill('warn','곧 할 일', c.soon));
+    $('#onlyDue').classList.toggle('on', state.onlyDue);
+    $('#onlyDue').setAttribute('aria-pressed', state.onlyDue);
+
+    const box = $('#assets'); box.innerHTML = '';
+    if(!state.assets.length){
+      const p = el('div','acard');
+      p.append(el('p','empty', state.ready
+        ? '아직 등록한 물건이 없습니다. "물건 추가"에서 세탁기, 에어컨, 식탁처럼 관리가 필요한 물건을 사진이나 직접 입력으로 넣으면, 제조사 자료를 찾아 관리 작업과 권장 주기를 목록으로 정리합니다.'
+        : '목록을 불러오는 중입니다…'));
+      box.append(p); return;
+    }
+    // 급한 작업이 있는 물건부터
+    const ranked = state.assets.map(a => {
+      const ts = tasksOf(a.id).map(t => ({ t, s: taskState(t) }));
+      const worst = ts.length ? Math.min.apply(null, ts.map(x => x.s.rank)) : 1e9;
+      return { a, ts, worst };
+    }).sort((x,y) => x.worst - y.worst || String(x.a.name).localeCompare(String(y.a.name),'ko'));
+
+    ranked.forEach(({ a, ts }) => {
+      const shown = state.onlyDue ? ts.filter(x => x.s.cls) : ts;
+      if(state.onlyDue && !shown.length) return;
+      const card = el('div','acard');
+      const head = el('button','ahead'); head.type = 'button';
+      const ht = el('div'); ht.append(el('div','t', a.name));
+      const meta = [a.brand, a.model].filter(Boolean).join(' · ');
+      if(meta) ht.append(el('div','m', meta));
+      head.append(ht);
+      if(a.room) head.append(el('span','room', a.room));
+      head.addEventListener('click', () => openAsset(a));
+      card.append(head);
+      if(a.careSummary) card.append(el('p','summ', a.careSummary));
+
+      if(state.searching[a.id]){
+        const s = el('div','searching'); s.append(el('span','spin'), el('span', null, '제조사 자료에서 관리 방법을 찾는 중입니다… (20~40초)')); card.append(s);
+      }
+      if(ts.length){
+        const ol = el('ol','tasks');
+        ts.sort((x,y) => (x.t.createdAt||0) - (y.t.createdAt||0)).forEach(({ t, s }) => {
+          if(state.onlyDue && !s.cls) return;
+          const li = el('li', s.cls);
+          const body = el('button','tbody'); body.type = 'button';
+          body.append(el('span','tt', t.title));
+          const sub = el('span','ts');
+          sub.append('주기 ' + spanText(Number(t.intervalDays) || 30) + ' · ');
+          if(t.lastDone) sub.append('마지막 ' + fullDate(t.lastDone));
+          else sub.append(el('span','red','아직 기록 없음'));
+          body.append(sub);
+          body.addEventListener('click', () => openTask(t));
+          const right = el('div','tright');
+          right.append(el('span','tstat ' + s.cls, s.label));
+          const done = el('button','donebtn','완료'); done.type = 'button';
+          done.addEventListener('click', () => openDone(t));
+          right.append(done);
+          li.append(body, right); ol.append(li);
+        });
+        card.append(ol);
+      } else if(!state.searching[a.id]) {
+        card.append(el('p','summ','관리 작업이 아직 없습니다. 아래 "관리법 찾기"를 누르거나 직접 추가해 주세요.'));
+      }
+      const foot = el('div','afoot');
+      const find = el('button','ghost', a.careUpdated ? '관리법 다시 찾기' : '관리법 찾기'); find.type = 'button';
+      find.disabled = !!state.searching[a.id];
+      find.addEventListener('click', () => findCare(a.id));
+      const add = el('button','ghost','작업 직접 추가'); add.type = 'button';
+      add.addEventListener('click', () => openTask(null, a.id));
+      foot.append(find, add);
+      card.append(foot);
+      box.append(card);
+    });
+    if(!box.children.length) box.append(el('p','empty','지금 해야 할 관리 작업이 없습니다.'));
+  }
+
+  $('#onlyDue').addEventListener('click', () => { state.onlyDue = !state.onlyDue; renderCare(); });
+
+  /* ---------- 냉장고: 직접 추가 ---------- */
+  $('#fAdd').addEventListener('submit', e => {
+    e.preventDefault();
+    const name = $('#fName').value.trim(); if(!name) return;
+    const row = { id: uid(), name, qty: $('#fQty').value.trim(), zone: $('#fZone').value, expiry: $('#fExp').value || '', list:'fridge', startDate: todayStr() };
+    $('#fName').value = ''; $('#fQty').value = ''; $('#fExp').value = '';
+    mutate(() => state.items.push(Object.assign({ done:false, createdAt: Date.now() }, row)), { action:'add', table:'items', rows:[row] });
+  });
+  $('#sAdd').addEventListener('submit', e => {
+    e.preventDefault();
+    const name = $('#sName').value.trim(); if(!name) return;
+    const row = { id: uid(), name, qty: $('#sQty').value.trim(), list:'shop' };
+    $('#sName').value = ''; $('#sQty').value = '';
+    mutate(() => state.items.push(Object.assign({ done:false, zone:'냉장', expiry:'', createdAt: Date.now() }, row)), { action:'add', table:'items', rows:[row] });
+  });
+  $('#moveIn').addEventListener('click', () => {
+    const ids = state.items.filter(i => i.list === 'shop' && i.done).map(i => i.id);
+    const p = { list:'fridge', done:false, createdAt: Date.now(), startDate: todayStr() };
+    mutate(() => patchLocal('items', ids, p), { action:'update', table:'items', ids, patch:p });
+    setFtab('fridge');
+  });
+  $('#clearDone').addEventListener('click', () => {
+    const ids = state.items.filter(i => i.list === 'shop' && i.done).map(i => i.id);
+    mutate(() => dropLocal('items', ids), { action:'delete', table:'items', ids });
+  });
+
+  /* ---------- 공통: 팝업 닫기, 두 번 눌러 삭제 ---------- */
+  const sheets = ['#editSheet','#photoSheet','#assetSheet','#taskSheet','#doneSheet'];
+  function anyOpen(){ return sheets.some(s => !$(s).hidden); }
+  sheets.forEach(s => $(s).addEventListener('click', e => { if(e.target === $(s)) $(s).hidden = true; }));
+  document.addEventListener('keydown', e => { if(e.key === 'Escape') sheets.forEach(s => $(s).hidden = true); });
+  function armDelete(btn, fn){
+    btn.dataset.armed = '';
+    btn.textContent = '삭제'; btn.classList.remove('armed');
+    btn.onclick = () => {
+      if(!btn.dataset.armed){ btn.dataset.armed = '1'; btn.textContent = '한 번 더 누르면 삭제'; btn.classList.add('armed'); return; }
+      fn();
+    };
+  }
+
+  /* ---------- 냉장고: 고치기 ---------- */
+  function openEdit(item){
+    state.editing = item.id;
+    $('#eName').value = item.name || ''; $('#eQty').value = item.qty || '';
+    $('#eZone').value = item.zone || '냉장'; $('#eExp').value = item.expiry || '';
+    $('#eStart').value = item.startDate || (item.createdAt ? ymd(new Date(item.createdAt)) : '');
+    armDelete($('#eDel'), () => { const id = state.editing; $('#editSheet').hidden = true; mutate(() => dropLocal('items',[id]), { action:'delete', table:'items', ids:[id] }); });
+    $('#editSheet').hidden = false;
+  }
+  $('#eCancel').addEventListener('click', () => $('#editSheet').hidden = true);
+  $('#quick').addEventListener('click', e => {
+    const b = e.target.closest('button'); if(!b) return;
+    $('#eExp').value = b.dataset.d === '' ? '' : addDays(todayStr(), Number(b.dataset.d));
+  });
+  $('#eSave').addEventListener('click', () => {
+    const id = state.editing; if(!id) return;
+    const name = $('#eName').value.trim(); if(!name){ $('#eName').focus(); return; }
+    const p = { name, qty: $('#eQty').value.trim(), zone: $('#eZone').value, expiry: $('#eExp').value || '', startDate: $('#eStart').value || '' };
+    $('#editSheet').hidden = true;
+    mutate(() => patchLocal('items',[id],p), { action:'update', table:'items', ids:[id], patch:p });
+  });
+  $('#eExpPhoto').addEventListener('click', () => { dateTarget = 'edit'; $('#photoDate').value = ''; $('#photoDate').click(); });
+
+  /* ---------- 사진 공통 ---------- */
+  function compress(file, max){
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file), img = new Image();
+      img.onload = () => {
+        const s = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+        const c = document.createElement('canvas');
+        c.width = Math.round(img.naturalWidth * s); c.height = Math.round(img.naturalHeight * s);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(url);
+        const d = c.toDataURL('image/jpeg', 0.85);
+        resolve({ mime:'image/jpeg', data: d.split(',')[1], preview: d });
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('이미지를 열 수 없습니다')); };
+      img.src = url;
+    });
+  }
+  const imgPayload = list => list.map(p => ({ mime: p.mime, data: p.data }));
+
+  /* ---------- 냉장고: 사진으로 넣기 ---------- */
+  $('#camBtn').addEventListener('click', () => { $('#photoNew').value = ''; $('#photoNew').click(); });
+  $('#pMore').addEventListener('click', () => { $('#photoNew').value = ''; $('#photoNew').click(); });
+  // 연속 촬영: 사진마다 따로 읽고, 읽는 동안에도 다음 사진을 찍을 수 있습니다
+  $('#photoNew').addEventListener('change', e => {
+    const files = Array.from(e.target.files || []).slice(0, 4);
+    if(!files.length) return;
+    $('#photoSheet').hidden = false;
+    state.jobs++; paintJobs();
+    Promise.all(files.map(f => compress(f, 2000))).then(imgs => {
+      state.photos = state.photos.concat(imgs);
+      paintThumbs();
+      return post({ action:'analyze', images: imgPayload(imgs), mode:'items' });
+    }).then(items => {
+      (items || []).forEach(it => state.found.push(Object.assign({ on:true }, it)));
+      if(!(items || []).length) setPhotoMsg('한 장에서 식품을 찾지 못했습니다. 제품 이름이 보이게 다시 찍어 주세요.');
+    }).catch(err => setPhotoMsg(friendly(err)))
+    .then(() => { state.jobs--; paintJobs(); paintFound(); });
+  });
+  $('#photoDate').addEventListener('change', e => {
+    const f = e.target.files && e.target.files[0]; if(!f) return;
+    const target = dateTarget;
+    const btn = target === 'edit' ? $('#eExpPhoto') : document.querySelector('[data-date-btn="' + target + '"]');
+    if(btn){ btn.disabled = true; btn.textContent = '읽는 중…'; }
+    compress(f, 2000).then(img => post({ action:'analyze', images: imgPayload([img]), mode:'date' }))
+    .then(r => {
+      const exp = (r && r.expiry) || '';
+      if(target === 'edit'){
+        if(exp) $('#eExp').value = exp; else setStatus('날짜를 읽지 못했습니다. 날짜 부분을 가까이 찍거나 직접 입력해 주세요.');
+        if(r && r.startDate) $('#eStart').value = r.startDate;
+      } else if(state.found[target]){
+        const it = state.found[target];
+        if(exp) it.expiry = exp;
+        if(r && r.startDate) it.startDate = r.startDate;
+        it.note = exp ? (r.note || '') : '날짜를 읽지 못했습니다. 직접 입력해 주세요.';
+        paintFound();
+      }
+    }).catch(err => setStatus(friendly(err)))
+    .then(() => { if(btn){ btn.disabled = false; btn.textContent = target === 'edit' ? '사진으로 읽기' : '기한 사진'; } });
+  });
+
+  function paintJobs(){
+    $('#photoBusy').hidden = !state.jobs;
+    $('#busyText').textContent = '사진 ' + state.jobs + '장 읽는 중… 그동안 다음 사진을 계속 찍어도 됩니다.';
+    countSave();
+  }
+  function setPhotoMsg(t){ const m = $('#photoMsg'); m.textContent = t || ''; m.hidden = !t; }
+  function paintThumbs(){ const t = $('#thumbs'); t.innerHTML = ''; state.photos.forEach(p => { const i = document.createElement('img'); i.src = p.preview; i.alt = ''; t.append(i); }); }
+  function closePhoto(){ if(state.jobs) return; $('#photoSheet').hidden = true; state.photos = []; state.found = []; setPhotoMsg(''); $('#thumbs').innerHTML = ''; $('#found').innerHTML = ''; }
+  $('#pCancel').addEventListener('click', closePhoto);
+
+  function paintFound(){
+    const box = $('#found'); box.innerHTML = '';
+    state.found.forEach((it, idx) => {
+      const card = el('div','fcard' + (it.on ? '' : ' off'));
+      const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = it.on; cb.id = 'f-on-' + idx; cb.setAttribute('aria-label','넣기');
+      cb.addEventListener('change', () => { it.on = cb.checked; card.classList.toggle('off', !it.on); countSave(); });
+      const f = el('div','fields');
+      const mk = (type, val, id, label, on) => { const x = document.createElement('input'); x.type = type; x.value = val || ''; x.id = id; x.setAttribute('aria-label', label); x.addEventListener('input', () => on(x.value)); return x; };
+      const name = mk('text', it.name, 'f-name-' + idx, '이름', v => it.name = v); name.className = 'full';
+      const qty = mk('text', it.qty, 'f-qty-' + idx, '수량', v => it.qty = v);
+      const zone = document.createElement('select'); zone.id = 'f-zone-' + idx; zone.setAttribute('aria-label','보관 위치');
+      ZONES.forEach(z => { const o = document.createElement('option'); o.textContent = z; zone.append(o); });
+      zone.value = it.zone; zone.addEventListener('change', () => it.zone = zone.value);
+      const row = el('span','row-exp full');
+      const exp = mk('date', it.expiry, 'f-exp-' + idx, '유통기한', v => it.expiry = v);
+      const db = el('button','mini','기한 사진'); db.type = 'button'; db.dataset.dateBtn = idx;
+      db.addEventListener('click', () => { dateTarget = idx; $('#photoDate').value = ''; $('#photoDate').click(); });
+      row.append(exp, db);
+      f.append(name, qty, zone, row);
+      card.append(cb, f);
+      const notes = [];
+      if(it.startDate) notes.push('제조일 ' + fullDate(it.startDate));
+      if(it.note) notes.push(it.note);
+      else if(!it.expiry) notes.push('유통기한이 안 보였습니다. "기한 사진"으로 날짜 부분을 찍거나 직접 입력해 주세요.');
+      if(notes.length) card.append(el('div','note', notes.join(' · ')));
+      box.append(card);
+    });
+    countSave();
+  }
+  function countSave(){
+    const n = state.found.filter(i => i.on).length;
+    $('#pSave').disabled = !n || state.jobs > 0;
+    $('#pSave').textContent = state.jobs ? '읽는 중…' : (n ? '냉장고에 넣기 (' + n + ')' : '냉장고에 넣기');
+  }
+  $('#pSave').addEventListener('click', () => {
+    const rows = state.found.filter(i => i.on && String(i.name).trim()).map(i => ({
+      id: uid(), name: String(i.name).trim(), qty: i.qty, zone: i.zone, expiry: i.expiry || '', list:'fridge', startDate: i.startDate || todayStr(), verified:'pending' }));
+    closePhoto(); setFtab('fridge');
+    mutate(() => rows.forEach(r => state.items.push(Object.assign({ done:false, createdAt: Date.now() }, r))), { action:'add', table:'items', rows })
+      .then(ok => {
+        if(!ok || !rows.length) return;
+        // 제품명 웹 확인은 뒤에서 진행 (기다리지 않음). 끝나면 목록이 고쳐집니다.
+        post({ action:'verifyItems', ids: rows.map(r => r.id) }).then(d => { setAll(d); render(); }).catch(() => {});
+      });
+  });
+
+  /* ---------- 집관리: 물건 ---------- */
+  function openAsset(a){
+    state.assetEditing = a ? a.id : null;
+    $('#assetTitle').textContent = a ? '물건 정보' : '물건 추가';
+    $('#aName').value = a ? a.name : ''; $('#aBrand').value = a ? a.brand : ''; $('#aModel').value = a ? a.model : '';
+    $('#aCat').value = a ? (a.category || '가전') : '가전'; $('#aRoom').value = a ? a.room : '';
+    $('#aSave').textContent = a ? '저장' : '추가하고 관리법 찾기';
+    $('#aPhotoText').textContent = '제품이나 모델명 라벨 사진으로 입력';
+    $('#aDel').hidden = !a;
+    if(a) armDelete($('#aDel'), () => { const id = a.id; $('#assetSheet').hidden = true;
+      mutate(() => { dropLocal('assets',[id]); state.tasks = state.tasks.filter(t => t.assetId !== id); }, { action:'delete', table:'assets', ids:[id] }); });
+    // 출처
+    const info = $('#aInfo'), src = $('#aSources'), sug = $('#aSuggest');
+    src.innerHTML = ''; sug.hidden = true;
+    if(a && a.careUpdated){
+      info.hidden = false;
+      $('#aUpdated').textContent = '관리법을 찾은 날: ' + fullDate(a.careUpdated);
+      let list = []; try { list = JSON.parse(a.careSources || '[]'); } catch(e){}
+      if(list.length){
+        src.append(el('div','summ','참고한 자료'));
+        list.forEach(s => { const l = document.createElement('a'); l.href = s.uri; l.target = '_blank'; l.rel = 'noopener'; l.textContent = s.title; src.append(l); });
+      }
+      if(a.searchHtml){ sug.srcdoc = '<base target="_blank">' + a.searchHtml; sug.hidden = false; }
+    } else info.hidden = true;
+    $('#assetSheet').hidden = false;
+  }
+  $('#addAsset').addEventListener('click', () => openAsset(null));
+  $('#aCancel').addEventListener('click', () => $('#assetSheet').hidden = true);
+  $('#aPhoto').addEventListener('click', () => { $('#photoAsset').value = ''; $('#photoAsset').click(); });
+  $('#photoAsset').addEventListener('change', e => {
+    const files = Array.from(e.target.files || []).slice(0, 3); if(!files.length) return;
+    const btn = $('#aPhoto'); btn.disabled = true; $('#aPhotoText').textContent = '사진을 읽는 중입니다…';
+    Promise.all(files.map(f => compress(f, 2000)))
+      .then(imgs => post({ action:'analyze', images: imgPayload(imgs), mode:'appliance' }))
+      .then(r => {
+        if(r.name) $('#aName').value = r.name;
+        if(r.brand) $('#aBrand').value = r.brand;
+        if(r.model) $('#aModel').value = r.model;
+        if(r.category) $('#aCat').value = r.category;
+        $('#aPhotoText').textContent = r.model ? '읽었습니다. 내용을 확인해 주세요' : '모델명은 못 읽었습니다. 라벨을 가까이 찍거나 직접 입력해 주세요';
+      })
+      .catch(err => { $('#aPhotoText').textContent = friendly(err); })
+      .then(() => { btn.disabled = false; });
+  });
+  $('#aSave').addEventListener('click', () => {
+    const name = $('#aName').value.trim(); if(!name){ $('#aName').focus(); return; }
+    const data = { name, brand: $('#aBrand').value.trim(), model: $('#aModel').value.trim(), category: $('#aCat').value, room: $('#aRoom').value.trim() };
+    $('#assetSheet').hidden = true;
+    if(state.assetEditing){
+      const id = state.assetEditing;
+      mutate(() => patchLocal('assets',[id],data), { action:'update', table:'assets', ids:[id], patch:data });
+    } else {
+      const row = Object.assign({ id: uid() }, data);
+      mutate(() => state.assets.push(Object.assign({ createdAt: Date.now() }, row)), { action:'add', table:'assets', rows:[row] })
+        .then(ok => { if(ok) findCare(row.id); });
+    }
+  });
+
+  function findCare(id){
+    if(state.searching[id]) return;
+    state.searching[id] = true; render();
+    post({ action:'findCare', assetId: id })
+      .then(d => { setAll(d); setStatus(''); })
+      .catch(err => setStatus(friendly(err)))
+      .then(() => { delete state.searching[id]; render(); });
+  }
+
+  /* ---------- 집관리: 작업 상세 ---------- */
+  function openTask(t, assetId){
+    state.taskEditing = t ? t.id : null;
+    state.taskAsset = t ? t.assetId : assetId;
+    const a = assetOf(state.taskAsset);
+    $('#taskTitle').textContent = t ? '관리 작업' : '작업 직접 추가';
+    $('#tAsset').textContent = a ? [a.name, a.brand, a.model].filter(Boolean).join(' · ') : '';
+    $('#tName').value = t ? t.title : '';
+    $('#tInterval').value = t ? (Number(t.intervalDays) || 30) : 30;
+    $('#tHow').value = t ? (t.howTo || '') : '';
+    state.taskDraftHist = t && t.history ? t.history.split(',').filter(Boolean) : [];
+    paintHist();
+    $('#tHistWrap').hidden = !t;
+    $('#tDel').hidden = !t;
+    if(t) armDelete($('#tDel'), () => { const id = t.id; $('#taskSheet').hidden = true; mutate(() => dropLocal('tasks',[id]), { action:'delete', table:'tasks', ids:[id] }); });
+    $('#taskSheet').hidden = false;
+  }
+  function paintHist(){
+    const ul = $('#tHist'); ul.innerHTML = '';
+    if(!state.taskDraftHist.length){ ul.append(el('li', null, '아직 없음')); ul.lastChild.style.paddingRight = '10px'; return; }
+    state.taskDraftHist.slice().sort().reverse().forEach(d => {
+      const li = el('li', null, fullDate(d));
+      const x = el('button', null, '×'); x.type = 'button'; x.setAttribute('aria-label', fullDate(d) + ' 기록 지우기');
+      x.addEventListener('click', () => { state.taskDraftHist = state.taskDraftHist.filter(v => v !== d); paintHist(); });
+      li.append(x); ul.append(li);
+    });
+  }
+  $('#tQuick').addEventListener('click', e => { const b = e.target.closest('button'); if(b) $('#tInterval').value = b.dataset.i; });
+  $('#tCancel').addEventListener('click', () => $('#taskSheet').hidden = true);
+  $('#tSave').addEventListener('click', () => {
+    const title = $('#tName').value.trim(); if(!title){ $('#tName').focus(); return; }
+    const iv = Math.max(1, Math.min(3650, Math.round(Number($('#tInterval').value) || 30)));
+    const howTo = $('#tHow').value.trim();
+    $('#taskSheet').hidden = true;
+    if(state.taskEditing){
+      const id = state.taskEditing;
+      const hist = state.taskDraftHist.slice().sort();
+      const last = hist.length ? hist[hist.length - 1] : '';
+      const p = { title, intervalDays: iv, howTo, history: hist.join(','), lastDone: last, nextDue: last ? addDays(last, iv) : '' };
+      mutate(() => patchLocal('tasks',[id],p), { action:'update', table:'tasks', ids:[id], patch:p });
+    } else {
+      const row = { id: uid(), assetId: state.taskAsset, title, intervalDays: iv, howTo, lastDone:'', nextDue:'', history:'', origin:'manual' };
+      mutate(() => state.tasks.push(Object.assign({ createdAt: Date.now() }, row)), { action:'add', table:'tasks', rows:[row] });
+    }
+  });
+
+  /* ---------- 집관리: 완료 기록 ---------- */
+  function openDone(t){
+    state.doneTask = t.id;
+    const a = assetOf(t.assetId);
+    $('#dTask').textContent = (a ? a.name + ' · ' : '') + t.title;
+    $('#dDate').value = todayStr();
+    $('#doneSheet').hidden = false;
+  }
+  $('#dQuick').addEventListener('click', e => { const b = e.target.closest('button'); if(b) $('#dDate').value = addDays(todayStr(), -Number(b.dataset.b)); });
+  $('#dCancel').addEventListener('click', () => $('#doneSheet').hidden = true);
+  $('#dSave').addEventListener('click', () => {
+    const t = state.tasks.find(x => x.id === state.doneTask); if(!t) return;
+    const d = $('#dDate').value || todayStr();
+    if(d > todayStr()){ $('#dDate').focus(); return; }
+    const hist = (t.history ? t.history.split(',') : []).filter(Boolean);
+    if(!hist.includes(d)) hist.push(d);
+    hist.sort();
+    const last = hist[hist.length - 1], iv = Number(t.intervalDays) || 30;
+    const p = { history: hist.join(','), lastDone: last, nextDue: addDays(last, iv) };
+    $('#doneSheet').hidden = true;
+    mutate(() => patchLocal('tasks',[t.id],p), { action:'update', table:'tasks', ids:[t.id], patch:p });
+  });
+
+  /* ---------- 화면 켜두기 (아이패드 거치용) ---------- */
+  let lock = null, wantLock = false;
+  if('wakeLock' in navigator){
+    const w = $('#wake'); w.hidden = false;
+    const paintWake = () => { w.classList.toggle('on', !!lock); w.textContent = lock ? '화면 켜둠' : '화면 켜두기'; };
+    const grab = () => navigator.wakeLock.request('screen')
+      .then(l => { lock = l; lock.addEventListener('release', () => { lock = null; paintWake(); }); paintWake(); })
+      .catch(() => { wantLock = false; w.hidden = true; });
+    w.addEventListener('click', () => { if(lock){ wantLock = false; lock.release().catch(() => {}); lock = null; paintWake(); } else { wantLock = true; grab(); } });
+    document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible' && wantLock && !lock) grab(); });
+  }
+
+  /* ---------- 연결 화면 · 시작 ---------- */
+  let started = false;
+  function showConnect(msg){
+    $('#app').hidden = true; $('#connect').hidden = false;
+    $('#cUrl').value = conn.url || ''; $('#cPw').value = '';
+    $('#cErr').textContent = msg || ''; $('#cErr').hidden = !msg;
+  }
+  function startApp(){
+    $('#connect').hidden = true; $('#app').hidden = false;
+    paintToday();
+    const h = location.hash.slice(1);
+    go(h === 'fridge' || h === 'care' ? h : 'home');
+    refresh();
+    if(!started){
+      started = true;
+      document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible' && !$('#app').hidden){ paintToday(); if(!anyOpen()) refresh(); } });
+      setInterval(() => { if(document.visibilityState === 'visible' && !$('#app').hidden && !anyOpen() && !Object.keys(state.searching).length) refresh(); }, 30000);
+      window.addEventListener('hashchange', () => { const v = location.hash.slice(1); go(v === 'fridge' || v === 'care' ? v : 'home'); });
+    }
+  }
+  $('#cGo').addEventListener('click', () => {
+    const url = $('#cUrl').value.trim(), pw = $('#cPw').value;
+    if(!/^https:\/\/script\.google\.com\/.+\/exec$/.test(url)){ $('#cErr').textContent = '웹 앱 URL은 https://script.google.com/ 으로 시작하고 /exec 로 끝나야 합니다.'; $('#cErr').hidden = false; return; }
+    if(!pw){ $('#cPw').focus(); return; }
+    const btn = $('#cGo'); btn.disabled = true; btn.textContent = '확인 중…';
+    conn = { url, pw };
+    post({ action:'all' }).then(d => { saveConn(); setAll(d); startApp(); })
+    .catch(err => {
+      const m = String(err.message);
+      $('#cErr').textContent = m.includes('WRONG_PASSWORD') ? '비밀번호가 맞지 않습니다.'
+        : m.includes('NO_PASSWORD_SET') ? '스크립트 속성에 APP_PASSWORD를 먼저 넣고, 새 버전으로 다시 배포해 주세요.'
+        : m.includes('UNKNOWN_ACTION') ? '앱스 스크립트가 예전 버전입니다. 새 Code.gs로 바꾸고 새 버전으로 다시 배포해 주세요.'
+        : '연결하지 못했습니다. URL이 맞는지, 배포 액세스가 "모든 사용자"인지 확인해 주세요.';
+      $('#cErr').hidden = false;
+      $('#connect').hidden = false; $('#app').hidden = true;
+    }).then(() => { btn.disabled = false; btn.textContent = '연결하기'; });
+  });
+  $('#cPw').addEventListener('keydown', e => { if(e.key === 'Enter') $('#cGo').click(); });
+  $('#gear').addEventListener('click', () => showConnect(''));
+
+  if(conn && conn.url && conn.pw) startApp(); else showConnect('');
+})();
+</script>
+</body>
+</html>
